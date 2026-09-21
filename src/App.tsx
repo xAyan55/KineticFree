@@ -1,14 +1,52 @@
+import { useState, useEffect } from "react"
 import { Hero } from "@/components/Hero"
 import { Features } from "@/components/ui/features-8"
 import { TestimonialMarqueeDemo } from "@/components/ui/marquee-01"
 import { Footer } from "@/components/ui/large-name-footer"
 import { DotPattern } from "@/components/ui/dot-pattern"
+import { AuthUI } from "@/components/ui/auth-fuse"
 
 export function App() {
+  const [view, setView] = useState<"landing" | "login">("landing")
+
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash
+      const path = window.location.pathname
+      if (
+        hash === "#login" ||
+        hash === "#dashboard" ||
+        hash === "#auth" ||
+        path === "/login" ||
+        path === "/dashboard"
+      ) {
+        setView("login")
+      } else {
+        setView("landing")
+      }
+    }
+
+    handleHash()
+    window.addEventListener("hashchange", handleHash)
+    window.addEventListener("popstate", handleHash)
+    return () => {
+      window.removeEventListener("hashchange", handleHash)
+      window.removeEventListener("popstate", handleHash)
+    }
+  }, [])
+
+  if (view === "login") {
+    return (
+      <div className="relative min-h-screen bg-black">
+        <AuthUI onBack={() => { window.location.hash = ""; setView("landing") }} />
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-black text-white dark flex flex-col">
       {/* Top Hero landing page */}
-      <Hero />
+      <Hero onOpenDashboard={() => { window.location.hash = "#login"; setView("login") }} />
 
       {/* Features Section */}
       <div className="relative z-20 border-t border-white/10 bg-black">

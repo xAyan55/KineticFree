@@ -49,7 +49,17 @@ export function AuthPage() {
 					<div className="bg-[radial-gradient(50%_50%_at_50%_50%,--theme(--color-foreground/.04)_0,--theme(--color-foreground/.01)_80%,transparent_100%)] absolute top-0 right-0 h-320 w-60 -translate-y-87.5 rounded-full" />
 				</div>
 				<Button variant="ghost" className="absolute top-7 left-5" asChild>
-					<a href="#">
+					<a
+						href="#"
+						onClick={(e) => {
+							e.preventDefault();
+							window.location.hash = '';
+							if (window.location.pathname === '/login') {
+								window.history.pushState({}, '', '/');
+								window.dispatchEvent(new PopStateEvent('popstate'));
+							}
+						}}
+					>
 						<ChevronLeftIcon className='size-4 me-2' />
 						Home
 					</a>

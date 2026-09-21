@@ -1,5 +1,7 @@
-import { AuthPage } from "@/components/ui/auth-page";
+import { AuthUI } from "@/components/ui/auth-fuse";
 
-export default function DemoOne() {
-  return <AuthPage />;
-}
+const DemoOne = () => {
+  return <AuthUI />;
+};
+
+export default DemoOne;

@@ -19,7 +19,7 @@ function Footer({
         <div className="flex flex-col md:flex-row justify-between gap-8">
           <div className="mb-8 md:mb-0 max-w-sm">
             <Link href="#top" className="flex items-center gap-2 text-white hover:opacity-90 transition-opacity">
-              <Icons.logo className="icon-class w-7 h-7 text-white" />
+              <img src="/images/logo.png" alt={brandName} className="w-7 h-7 rounded-md object-contain" />
               <h2 className="text-lg font-bold tracking-tight">{brandName}</h2>
             </Link>
 

@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react"
 
-export function Hero() {
+interface HeroProps {
+  onOpenDashboard?: () => void
+}
+
+export function Hero({ onOpenDashboard }: HeroProps = {}) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
@@ -63,15 +67,8 @@ export function Hero() {
 
       {/* Header */}
       <header className="header relative z-50 grid grid-cols-[1fr_auto_1fr] items-center px-6 md:px-10 lg:px-16 pt-6 pb-2.5">
-        <a href="#top" className="logo inline-flex items-center gap-2.5 justify-self-start text-[15.5px] font-semibold tracking-[-0.03em] text-white" aria-label="KineticHost">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="w-[22px] h-[22px] block" aria-hidden="true">
-            <g transform="rotate(-30 12 12)">
-              <circle cx="7.3" cy="3.2" r="1.45" />
-              <rect x="5.5" y="4.7" width="3.6" height="14.6" rx="1.8" />
-              <rect x="14.9" y="4.7" width="3.6" height="14.6" rx="1.8" />
-              <circle cx="16.7" cy="20.8" r="1.45" />
-            </g>
-          </svg>
+        <a href="#top" className="logo inline-flex items-center gap-2.5 justify-self-start text-[15.5px] font-semibold tracking-[-0.03em] text-white group" aria-label="KineticHost">
+          <img src="/images/logo.png" alt="KineticHost" className="w-[22px] h-[22px] rounded object-contain transition-transform group-hover:scale-105" />
           <span>Kinetic<span className="font-normal opacity-90">Host</span></span>
         </a>
 
@@ -108,13 +105,19 @@ export function Hero() {
             Reviews
           </a>
           <a
-            href="#dashboard"
+            href="#login"
             className={`${
               menuOpen
                 ? "w-full max-w-xs text-center py-3 text-lg text-white border-b border-white/10"
                 : "hidden"
             }`}
-            onClick={() => setMenuOpen(false)}
+            onClick={(e) => {
+              setMenuOpen(false)
+              if (onOpenDashboard) {
+                e.preventDefault()
+                onOpenDashboard()
+              }
+            }}
           >
             Dashboard
           </a>
@@ -123,7 +126,13 @@ export function Hero() {
         {/* Right CTA */}
         <div className="flex items-center gap-2.5 justify-self-end">
           <a
-            href="#dashboard"
+            href="#login"
+            onClick={(e) => {
+              if (onOpenDashboard) {
+                e.preventDefault()
+                onOpenDashboard()
+              }
+            }}
             className="inline-flex items-center justify-center h-[36px] px-4 rounded-full text-[13px] font-medium tracking-tight text-zinc-300 hover:text-white border border-white/15 bg-white/[0.05] hover:bg-white/10 hover:border-white/30 backdrop-blur-xl transition-all duration-200 cursor-pointer whitespace-nowrap"
           >
             Dashboard
