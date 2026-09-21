@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-interface HeroProps {
-  onOpenAuth?: () => void
-}
-
-export function Hero({ onOpenAuth }: HeroProps = {}) {
+export function Hero() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
@@ -65,36 +61,34 @@ export function Hero({ onOpenAuth }: HeroProps = {}) {
         onClick={() => setMenuOpen(false)}
       />
 
-      {/* Header */}
-      <header className="header relative z-50 grid grid-cols-[1fr_auto_1fr] items-center px-6 md:px-10 lg:px-16 pt-6 pb-2.5">
-        <a href="#top" className="logo inline-flex items-center gap-2.5 justify-self-start text-[15.5px] font-semibold tracking-[-0.03em] text-white" aria-label="KineticHost">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="w-[22px] h-[22px] block" aria-hidden="true">
-            <g transform="rotate(-30 12 12)">
-              <circle cx="7.3" cy="3.2" r="1.45" />
-              <rect x="5.5" y="4.7" width="3.6" height="14.6" rx="1.8" />
-              <rect x="14.9" y="4.7" width="3.6" height="14.6" rx="1.8" />
-              <circle cx="16.7" cy="20.8" r="1.45" />
-            </g>
-          </svg>
-          <span>Kinetic<span className="font-normal opacity-90">Host</span></span>
+      {/* Header with Floating Pill Navigation Dock */}
+      <header className="site-header relative z-50 flex items-center justify-between px-6 md:px-12 py-6 w-full max-w-[1400px] mx-auto">
+        {/* Brand */}
+        <a href="#" className="flex items-center gap-2 text-white font-semibold text-[17px] tracking-tight group">
+          <div className="w-5 h-5 flex items-center justify-center">
+            <svg className="w-4 h-4 fill-white transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            </svg>
+          </div>
+          KineticHost
         </a>
 
-        {/* Center Navigation */}
+        {/* Floating Pill Center Navigation */}
         <nav
           id="site-nav"
-          aria-label="Primary"
-          className={`${
+          className={`site-nav ${
             menuOpen
-              ? "fixed inset-0 z-45 flex flex-col justify-start items-center gap-4 pt-28 px-6 bg-black/95 backdrop-blur-2xl md:hidden"
-              : "hidden md:flex items-center gap-1 px-1.5 py-1 rounded-full border border-white/15 bg-white/[0.05] backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_24px_rgba(0,0,0,0.5)] justify-self-center"
+              ? "flex flex-col items-center justify-center fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl gap-6"
+              : "hidden md:inline-flex items-center gap-1 p-1 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl shadow-[0_2px_16px_rgba(0,0,0,0.5)]"
           }`}
+          aria-label="Main"
         >
           <a
             href="#features"
             className={`${
               menuOpen
-                ? "w-full max-w-xs text-center py-3 text-lg text-white border-b border-white/10"
-                : "inline-flex items-center justify-center h-[32px] px-4 rounded-full text-[13px] font-medium tracking-tight text-zinc-300 hover:text-white hover:bg-white/10 transition-all duration-200"
+                ? "text-2xl text-white font-medium"
+                : "px-5 py-1.5 rounded-full text-[13.5px] font-medium tracking-tight text-zinc-300 hover:text-white hover:bg-white/10 transition-all duration-200"
             }`}
             onClick={() => setMenuOpen(false)}
           >
@@ -104,8 +98,8 @@ export function Hero({ onOpenAuth }: HeroProps = {}) {
             href="#reviews"
             className={`${
               menuOpen
-                ? "w-full max-w-xs text-center py-3 text-lg text-white border-b border-white/10"
-                : "inline-flex items-center justify-center h-[32px] px-4 rounded-full text-[13px] font-medium tracking-tight text-zinc-300 hover:text-white hover:bg-white/10 transition-all duration-200"
+                ? "text-2xl text-white font-medium"
+                : "px-5 py-1.5 rounded-full text-[13.5px] font-medium tracking-tight text-zinc-300 hover:text-white hover:bg-white/10 transition-all duration-200"
             }`}
             onClick={() => setMenuOpen(false)}
           >
@@ -116,13 +110,7 @@ export function Hero({ onOpenAuth }: HeroProps = {}) {
         {/* Right CTA */}
         <div className="flex items-center gap-2 justify-self-end">
           <a
-            href="#auth"
-            onClick={(e) => {
-              if (onOpenAuth) {
-                e.preventDefault()
-                onOpenAuth()
-              }
-            }}
+            href="#features"
             className="inline-flex items-center justify-center h-[36px] px-4.5 rounded-full text-[13px] font-medium tracking-tight text-[#111] bg-white hover:bg-zinc-200 shadow-[0_2px_12px_rgba(255,255,255,0.2)] transition-all duration-200 cursor-pointer whitespace-nowrap"
           >
             Create Free Server
@@ -172,13 +160,7 @@ export function Hero({ onOpenAuth }: HeroProps = {}) {
           {/* Action Buttons */}
           <div className="hero-actions flex flex-wrap justify-center items-center gap-3 mt-7 w-full sm:w-auto">
             <a
-              href="#auth"
-              onClick={(e) => {
-                if (onOpenAuth) {
-                  e.preventDefault()
-                  onOpenAuth()
-                }
-              }}
+              href="#features"
               className="inline-flex items-center justify-center h-[44px] px-6 rounded-full text-[14px] font-semibold tracking-tight text-black bg-white hover:bg-zinc-200 shadow-[0_0_24px_rgba(255,255,255,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer w-full sm:w-auto whitespace-nowrap"
             >
               Create Free Server
