@@ -107,10 +107,27 @@ export function Hero() {
           >
             Reviews
           </a>
+          <a
+            href="#dashboard"
+            className={`${
+              menuOpen
+                ? "w-full max-w-xs text-center py-3 text-lg text-white border-b border-white/10"
+                : "hidden"
+            }`}
+            onClick={() => setMenuOpen(false)}
+          >
+            Dashboard
+          </a>
         </nav>
 
         {/* Right CTA */}
-        <div className="flex items-center gap-2 justify-self-end">
+        <div className="flex items-center gap-2.5 justify-self-end">
+          <a
+            href="#dashboard"
+            className="inline-flex items-center justify-center h-[36px] px-4 rounded-full text-[13px] font-medium tracking-tight text-zinc-300 hover:text-white border border-white/15 bg-white/[0.05] hover:bg-white/10 hover:border-white/30 backdrop-blur-xl transition-all duration-200 cursor-pointer whitespace-nowrap"
+          >
+            Dashboard
+          </a>
           <a
             href="#features"
             className="inline-flex items-center justify-center h-[36px] px-4.5 rounded-full text-[13px] font-medium tracking-tight text-[#111] bg-white hover:bg-zinc-200 shadow-[0_2px_12px_rgba(255,255,255,0.2)] transition-all duration-200 cursor-pointer whitespace-nowrap"
