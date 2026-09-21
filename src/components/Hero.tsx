@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react"
 
-export function Hero() {
+interface HeroProps {
+  onOpenAuth?: () => void
+}
+
+export function Hero({ onOpenAuth }: HeroProps = {}) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
@@ -112,7 +116,13 @@ export function Hero() {
         {/* Right CTA */}
         <div className="flex items-center gap-2 justify-self-end">
           <a
-            href="#features"
+            href="#auth"
+            onClick={(e) => {
+              if (onOpenAuth) {
+                e.preventDefault()
+                onOpenAuth()
+              }
+            }}
             className="inline-flex items-center justify-center h-[36px] px-4.5 rounded-full text-[13px] font-medium tracking-tight text-[#111] bg-white hover:bg-zinc-200 shadow-[0_2px_12px_rgba(255,255,255,0.2)] transition-all duration-200 cursor-pointer whitespace-nowrap"
           >
             Create Free Server
@@ -162,7 +172,13 @@ export function Hero() {
           {/* Action Buttons */}
           <div className="hero-actions flex flex-wrap justify-center items-center gap-3 mt-7 w-full sm:w-auto">
             <a
-              href="#features"
+              href="#auth"
+              onClick={(e) => {
+                if (onOpenAuth) {
+                  e.preventDefault()
+                  onOpenAuth()
+                }
+              }}
               className="inline-flex items-center justify-center h-[44px] px-6 rounded-full text-[14px] font-semibold tracking-tight text-black bg-white hover:bg-zinc-200 shadow-[0_0_24px_rgba(255,255,255,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer w-full sm:w-auto whitespace-nowrap"
             >
               Create Free Server

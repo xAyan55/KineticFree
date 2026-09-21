@@ -28,3 +28,9 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Database
+data/
+*.db
+*.sqlite
+*.sqlite3

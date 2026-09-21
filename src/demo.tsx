@@ -1,8 +1,13 @@
 "use client";
 
+import { AuthPage } from "@/components/ui/auth-page";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { Footer } from "@/components/ui/large-name-footer";
 import { cn } from "@/lib/utils";
+
+export function DemoOne() {
+  return <AuthPage />;
+}
 
 export function DotPatternDemo() {
   return (
@@ -30,4 +35,4 @@ export function FooterDemo() {
   );
 }
 
-export default DotPatternDemo;
+export default DemoOne;
