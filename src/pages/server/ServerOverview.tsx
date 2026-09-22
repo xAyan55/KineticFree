@@ -28,18 +28,23 @@ export const ServerOverview: React.FC = () => {
 
   useEffect(() => {
     if (!id) return
+    const isOnline = server.status === "running"
+    if (!isOnline) {
+      setResources(null)
+      return
+    }
     const fetchRes = async () => {
       try {
         const data = await serverApi.getResources(id)
         setResources(data)
       } catch (err) {
-        console.error(err)
+        setResources(null)
       }
     }
     fetchRes()
-    const int = setInterval(fetchRes, 2500)
+    const int = setInterval(fetchRes, 3000)
     return () => clearInterval(int)
-  }, [id])
+  }, [id, server.status])
 
   const copyText = (val: string, key: string) => {
     navigator.clipboard.writeText(val)
@@ -57,10 +62,13 @@ export const ServerOverview: React.FC = () => {
     return `${m}m ${seconds % 60}s`
   }
 
-  const memMb = resources ? (resources.memoryUsage / 1024 / 1024).toFixed(0) : "0"
+  const isOnline = server.status === "running"
+  const telemetryAvailable = isOnline && resources !== null
+  const memMb = telemetryAvailable ? (resources.memoryUsage / 1024 / 1024).toFixed(0) : null
   const memLimitMb = server.limits.memory || 2048
-  const diskMb = resources ? (resources.diskUsage / 1024 / 1024).toFixed(0) : "0"
+  const diskMb = telemetryAvailable ? (resources.diskUsage / 1024 / 1024).toFixed(0) : null
   const diskLimitMb = server.limits.disk || 10240
+  const sftpHost = server.allocation?.ip ? `sftp.${server.allocation.ip}` : "Not configured"
 
   return (
     <div className="space-y-6 pb-12">
@@ -75,7 +83,7 @@ export const ServerOverview: React.FC = () => {
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-2xl font-bold font-mono text-white">
-              {resources ? resources.cpuUsage.toFixed(1) : "0.0"}%
+              {telemetryAvailable ? `${resources.cpuUsage.toFixed(1)}%` : "—"}
             </span>
             <span className="text-xs font-mono text-zinc-400">
               / {server.limits.cpu}%
@@ -85,7 +93,9 @@ export const ServerOverview: React.FC = () => {
             <div
               className="h-full bg-emerald-400 rounded-full transition-all duration-300"
               style={{
-                width: `${Math.min(100, (Number(resources?.cpuUsage || 0) / (server.limits.cpu || 100)) * 100)}%`,
+                width: telemetryAvailable
+                  ? `${Math.min(100, (Number(resources?.cpuUsage || 0) / (server.limits.cpu || 100)) * 100)}%`
+                  : "0%",
               }}
             />
           </div>
@@ -100,7 +110,7 @@ export const ServerOverview: React.FC = () => {
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-2xl font-bold font-mono text-white">
-              {memMb} MB
+              {telemetryAvailable ? `${memMb} MB` : "—"}
             </span>
             <span className="text-xs font-mono text-zinc-400">
               / {memLimitMb} MB
@@ -110,7 +120,9 @@ export const ServerOverview: React.FC = () => {
             <div
               className="h-full bg-white rounded-full transition-all duration-300"
               style={{
-                width: `${Math.min(100, (Number(memMb) / memLimitMb) * 100)}%`,
+                width: telemetryAvailable && memMb
+                  ? `${Math.min(100, (Number(memMb) / memLimitMb) * 100)}%`
+                  : "0%",
               }}
             />
           </div>
@@ -125,7 +137,7 @@ export const ServerOverview: React.FC = () => {
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-2xl font-bold font-mono text-white">
-              {diskMb} MB
+              {telemetryAvailable ? `${diskMb} MB` : "—"}
             </span>
             <span className="text-xs font-mono text-zinc-400">
               / {diskLimitMb} MB
@@ -135,7 +147,9 @@ export const ServerOverview: React.FC = () => {
             <div
               className="h-full bg-blue-400 rounded-full transition-all duration-300"
               style={{
-                width: `${Math.min(100, (Number(diskMb) / diskLimitMb) * 100)}%`,
+                width: telemetryAvailable && diskMb
+                  ? `${Math.min(100, (Number(diskMb) / diskLimitMb) * 100)}%`
+                  : "0%",
               }}
             />
           </div>
@@ -150,7 +164,7 @@ export const ServerOverview: React.FC = () => {
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-2xl font-bold font-mono text-white">
-              {server.status === "running" ? formatUptime(resources?.uptime || 14200) : "Offline"}
+              {server.status === "running" ? (resources?.uptime ? formatUptime(resources.uptime) : "Active") : "Offline"}
             </span>
           </div>
           <p className="mt-3 text-xs font-mono text-zinc-500">
@@ -183,14 +197,16 @@ export const ServerOverview: React.FC = () => {
             <div className="flex items-center justify-between rounded-lg bg-black border border-zinc-800/80 p-3">
               <div>
                 <span className="text-[10px] font-mono uppercase text-zinc-500 block">Server Host</span>
-                <span className="font-mono text-xs text-white">sftp.kinetic.host</span>
+                <span className="font-mono text-xs text-white">{sftpHost}</span>
               </div>
-              <button
-                onClick={() => copyText("sftp.kinetic.host", "sftp_host")}
-                className="text-zinc-400 hover:text-white"
-              >
-                {copiedKey === "sftp_host" ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
-              </button>
+              {sftpHost !== "Not configured" && (
+                <button
+                  onClick={() => copyText(sftpHost, "sftp_host")}
+                  className="text-zinc-400 hover:text-white"
+                >
+                  {copiedKey === "sftp_host" ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
+                </button>
+              )}
             </div>
 
             <div className="flex items-center justify-between rounded-lg bg-black border border-zinc-800/80 p-3">

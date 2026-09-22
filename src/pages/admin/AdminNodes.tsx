@@ -101,77 +101,91 @@ export const AdminNodes: React.FC = () => {
       </div>
 
       {/* Nodes Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {nodes.map((node) => {
-          const isOnline = node.status === "online"
-          const memPercent = (node.memoryAllocated / node.memory) * 100
-          const diskPercent = (node.diskAllocated / node.disk) * 100
+      {nodes.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-zinc-800 p-12 text-center">
+          <Cpu className="mx-auto h-8 w-8 text-zinc-600" />
+          <p className="mt-3 text-sm text-zinc-400 font-mono">No host node clusters configured yet.</p>
+          <Button
+            size="sm"
+            onClick={() => setCreateOpen(true)}
+            className="mt-4 bg-white text-black hover:bg-zinc-200 text-xs font-mono"
+          >
+            Add First Node Cluster
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {nodes.map((node) => {
+            const isOnline = node.status === "online"
+            const memPercent = (node.memoryAllocated / node.memory) * 100
+            const diskPercent = (node.diskAllocated / node.disk) * 100
 
-          return (
-            <div
-              key={node.id}
-              className="rounded-xl border border-zinc-800/80 bg-zinc-950/70 p-5 space-y-4 backdrop-blur flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-sm text-white font-mono">{node.name}</h3>
-                      <Badge
-                        variant={isOnline ? "success" : "danger"}
-                        className="text-[9px] py-0 px-1 font-mono uppercase"
-                      >
-                        {node.status}
-                      </Badge>
+            return (
+              <div
+                key={node.id}
+                className="rounded-xl border border-zinc-800/80 bg-zinc-950/70 p-5 space-y-4 backdrop-blur flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-sm text-white font-mono">{node.name}</h3>
+                        <Badge
+                          variant={isOnline ? "success" : "danger"}
+                          className="text-[9px] py-0 px-1 font-mono uppercase"
+                        >
+                          {node.status}
+                        </Badge>
+                      </div>
+                      <span className="text-[11px] text-zinc-400 font-mono mt-0.5 block">
+                        {node.location} • {node.fqdn}
+                      </span>
                     </div>
-                    <span className="text-[11px] text-zinc-400 font-mono mt-0.5 block">
-                      {node.location} • {node.fqdn}
-                    </span>
+
+                    <button
+                      onClick={() => handleDelete(node.id)}
+                      className="rounded p-1 text-zinc-500 hover:text-rose-400"
+                      title="Delete node"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
 
-                  <button
-                    onClick={() => handleDelete(node.id)}
-                    className="rounded p-1 text-zinc-500 hover:text-rose-400"
-                    title="Delete node"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  <div className="mt-5 space-y-3 font-mono text-xs">
+                    <div>
+                      <div className="flex justify-between text-[11px] text-zinc-400 mb-1">
+                        <span>RAM ALLOCATION</span>
+                        <span className="text-zinc-200">{formatGb(node.memoryAllocated)} GB / {formatGb(node.memory)} GB</span>
+                      </div>
+                      <div className="h-1.5 w-full rounded-full bg-zinc-900 overflow-hidden">
+                        <div className="h-full bg-white rounded-full" style={{ width: `${memPercent}%` }} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-[11px] text-zinc-400 mb-1">
+                        <span>STORAGE (NVMe)</span>
+                        <span className="text-zinc-200">{formatGb(node.diskAllocated)} GB / {formatGb(node.disk)} GB</span>
+                      </div>
+                      <div className="h-1.5 w-full rounded-full bg-zinc-900 overflow-hidden">
+                        <div className="h-full bg-blue-400 rounded-full" style={{ width: `${diskPercent}%` }} />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="mt-5 space-y-3 font-mono text-xs">
-                  <div>
-                    <div className="flex justify-between text-[11px] text-zinc-400 mb-1">
-                      <span>RAM ALLOCATION</span>
-                      <span className="text-zinc-200">{formatGb(node.memoryAllocated)} GB / {formatGb(node.memory)} GB</span>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-zinc-900 overflow-hidden">
-                      <div className="h-full bg-white rounded-full" style={{ width: `${memPercent}%` }} />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-[11px] text-zinc-400 mb-1">
-                      <span>STORAGE (NVMe)</span>
-                      <span className="text-zinc-200">{formatGb(node.diskAllocated)} GB / {formatGb(node.disk)} GB</span>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-zinc-900 overflow-hidden">
-                      <div className="h-full bg-blue-400 rounded-full" style={{ width: `${diskPercent}%` }} />
-                    </div>
-                  </div>
+                <div className="pt-3 border-t border-zinc-800/60 flex items-center justify-between text-[11px] font-mono text-zinc-500">
+                  <span className="flex items-center gap-1">
+                    <ServerIcon className="h-3.5 w-3.5" />
+                    {node.serverCount} servers
+                  </span>
+                  <span>Daemon :8080 / SFTP :2022</span>
                 </div>
               </div>
-
-              <div className="pt-3 border-t border-zinc-800/60 flex items-center justify-between text-[11px] font-mono text-zinc-500">
-                <span className="flex items-center gap-1">
-                  <ServerIcon className="h-3.5 w-3.5" />
-                  {node.serverCount} servers
-                </span>
-                <span>Daemon :8080 / SFTP :2022</span>
-              </div>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      )}
 
       {/* Add Node Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>

@@ -52,8 +52,8 @@ export const Startup: React.FC = () => {
     }
   }
 
-  const startupCmd = config?.startup || `java -Xms128M -Xmx${server.limits.memory}M -jar server.jar nogui`
-  const dockerImg = config?.dockerImage || "ghcr.io/pterodactyl/yolks:java_21"
+  const startupCmd = config?.startup || (loading ? "Loading launch command..." : "Launch command unavailable")
+  const dockerImg = config?.dockerImage || (loading ? "Loading runtime..." : "Image not specified")
 
   return (
     <div className="space-y-6 pb-12">
@@ -64,7 +64,7 @@ export const Startup: React.FC = () => {
               STARTUP & JVM PARAMETERS
             </h1>
             <Badge variant="zinc" className="text-[10px] font-mono">
-              Java 21 LTS
+              {config?.dockerImage ? config.dockerImage.split("/").pop() || "Container" : "JVM"}
             </Badge>
           </div>
           <p className="mt-1 text-xs text-zinc-400 font-mono">

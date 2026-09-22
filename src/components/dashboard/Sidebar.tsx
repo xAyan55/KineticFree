@@ -94,9 +94,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose, isAdminView = false }
             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 font-mono">
               {isAdminView ? "Admin Management" : "Server Operations"}
             </span>
-            {isAdminView && (
-              <Badge variant="zinc" className="text-[9px] py-0 px-1.5">ROOT</Badge>
-            )}
           </div>
           <nav className="space-y-1">
             {(isAdminView ? adminNav : userNav).map((item) => {
@@ -233,7 +230,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose, isAdminView = false }
                   <span className="text-[9px] px-1 py-0.2 rounded bg-white text-black font-mono font-bold">ADMIN</span>
                 )}
               </div>
-              <span className="text-[10px] text-zinc-400 truncate max-w-[110px] font-mono">{user?.email || "user@kinetic.host"}</span>
+              <span className="text-[10px] text-zinc-400 truncate max-w-[110px] font-mono">{user?.email || ""}</span>
             </div>
           </div>
           <button

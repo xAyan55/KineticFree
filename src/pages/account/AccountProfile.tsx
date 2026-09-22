@@ -68,7 +68,7 @@ export const AccountProfile: React.FC = () => {
           <p className="text-xs text-zinc-400 font-mono">{user?.email}</p>
           <div className="flex items-center gap-4 text-[11px] text-zinc-500 font-mono pt-1">
             <span className="flex items-center gap-1">
-              <Calendar className="h-3 w-3" /> Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "2026"}
+              <Calendar className="h-3 w-3" /> Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}
             </span>
           </div>
         </div>

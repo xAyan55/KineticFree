@@ -146,43 +146,49 @@ export const AdminAllocations: React.FC = () => {
           <div className="col-span-2 sm:col-span-2 text-right">Actions</div>
         </div>
 
-        <div className="divide-y divide-zinc-800/60 text-xs font-mono">
-          {filtered.map((alloc) => (
-            <div
-              key={alloc.id}
-              className="grid grid-cols-12 items-center px-4 py-3 hover:bg-zinc-900/40 transition-colors"
-            >
-              <div className="col-span-4 sm:col-span-4 flex items-center gap-2">
-                <span className="font-bold text-white">{alloc.ip}:{alloc.port}</span>
-                {alloc.assigned ? (
-                  <Badge variant="zinc" className="text-[9px] py-0 px-1">IN USE</Badge>
-                ) : (
-                  <Badge variant="success" className="text-[9px] py-0 px-1">AVAILABLE</Badge>
-                )}
-              </div>
+        {filtered.length === 0 ? (
+          <div className="p-8 text-center text-xs font-mono text-zinc-500">
+            No port allocations found.
+          </div>
+        ) : (
+          <div className="divide-y divide-zinc-800/60 text-xs font-mono">
+            {filtered.map((alloc) => (
+              <div
+                key={alloc.id}
+                className="grid grid-cols-12 items-center px-4 py-3 hover:bg-zinc-900/40 transition-colors"
+              >
+                <div className="col-span-4 sm:col-span-4 flex items-center gap-2">
+                  <span className="font-bold text-white">{alloc.ip}:{alloc.port}</span>
+                  {alloc.assigned ? (
+                    <Badge variant="zinc" className="text-[9px] py-0 px-1">IN USE</Badge>
+                  ) : (
+                    <Badge variant="success" className="text-[9px] py-0 px-1">AVAILABLE</Badge>
+                  )}
+                </div>
 
-              <div className="col-span-3 sm:col-span-3 text-zinc-400">
-                {alloc.nodeName}
-              </div>
+                <div className="col-span-3 sm:col-span-3 text-zinc-400">
+                  {alloc.nodeName}
+                </div>
 
-              <div className="col-span-3 sm:col-span-3 text-zinc-300">
-                {alloc.serverName || <span className="text-zinc-600">—</span>}
-              </div>
+                <div className="col-span-3 sm:col-span-3 text-zinc-300">
+                  {alloc.serverName || <span className="text-zinc-600">—</span>}
+                </div>
 
-              <div className="col-span-2 sm:col-span-2 text-right">
-                {!alloc.assigned && (
-                  <button
-                    onClick={() => handleDelete(alloc.id)}
-                    className="rounded p-1 text-zinc-500 hover:text-rose-400"
-                    title="Delete allocation"
-                  >
-                    <Trash2 className="h-4 w-4 ml-auto" />
-                  </button>
-                )}
+                <div className="col-span-2 sm:col-span-2 text-right">
+                  {!alloc.assigned && (
+                    <button
+                      onClick={() => handleDelete(alloc.id)}
+                      className="rounded p-1 text-zinc-500 hover:text-rose-400"
+                      title="Delete allocation"
+                    >
+                      <Trash2 className="h-4 w-4 ml-auto" />
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Create Dialog */}

@@ -33,9 +33,9 @@ export const FileEditor: React.FC = () => {
     if (!id) return
     try {
       setLoading(true)
-      const text = await fileApi.getContent(id, filePath)
-      setContent(text)
-      setOriginalContent(text)
+      const result = await fileApi.getContent(id, filePath)
+      setContent(result.content)
+      setOriginalContent(result.content)
     } catch (err) {
       console.error(err)
     } finally {

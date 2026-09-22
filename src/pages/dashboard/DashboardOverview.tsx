@@ -53,7 +53,7 @@ export const DashboardOverview: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000)
   }
 
-  const handlePowerAction = async (serverId: string, action: string, e: React.MouseEvent) => {
+  const handlePowerAction = async (serverId: string, action: import("@/lib/types").PowerAction, e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setPowerLoading((prev) => ({ ...prev, [serverId]: true }))
@@ -79,6 +79,7 @@ export const DashboardOverview: React.FC = () => {
   const runningCount = serverList.filter((s) => s.status === "running").length
   const totalMemory = serverList.reduce((acc, s) => acc + (s.limits?.memory || 0), 0)
   const totalCpu = serverList.reduce((acc, s) => acc + (s.limits?.cpu || 0), 0)
+  const totalDisk = serverList.reduce((acc, s) => acc + (s.limits?.disk || 0), 0)
 
   const getStatusBadge = (status: Server["status"]) => {
     switch (status) {
@@ -188,20 +189,17 @@ export const DashboardOverview: React.FC = () => {
             <span className="text-2xl font-bold font-mono text-white">
               {loading ? "--" : `${(totalMemory / 1024).toFixed(1)} GB`}
             </span>
-            <span className="text-xs font-mono text-zinc-400">of 16.0 GB quota</span>
+            <span className="text-xs font-mono text-zinc-400">
+              across {serverList.length} {serverList.length === 1 ? "instance" : "instances"}
+            </span>
           </div>
-          <div className="mt-2 h-1 w-full rounded-full bg-zinc-800">
-            <div
-              className="h-1 rounded-full bg-white transition-all duration-500"
-              style={{ width: `${Math.min(100, (totalMemory / 16384) * 100)}%` }}
-            />
-          </div>
+          <p className="mt-3 text-[11px] font-mono text-zinc-500">Total committed memory</p>
         </div>
 
         <div className="rounded-xl border border-zinc-800/80 bg-zinc-950/60 p-5 backdrop-blur">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono font-medium uppercase tracking-wider text-zinc-500">
-              CPU Pool Share
+              Allocated CPU
             </span>
             <Cpu className="h-4 w-4 text-zinc-400" />
           </div>
@@ -209,30 +207,27 @@ export const DashboardOverview: React.FC = () => {
             <span className="text-2xl font-bold font-mono text-white">
               {loading ? "--" : `${totalCpu}%`}
             </span>
-            <span className="text-xs font-mono text-zinc-400">dedicated share</span>
+            <span className="text-xs font-mono text-zinc-400">
+              across {serverList.length} {serverList.length === 1 ? "instance" : "instances"}
+            </span>
           </div>
-          <div className="mt-2 h-1 w-full rounded-full bg-zinc-800">
-            <div
-              className="h-1 rounded-full bg-blue-500 transition-all duration-500"
-              style={{ width: `${Math.min(100, (totalCpu / 400) * 100)}%` }}
-            />
-          </div>
+          <p className="mt-3 text-[11px] font-mono text-zinc-500">Total committed threads</p>
         </div>
 
         <div className="rounded-xl border border-zinc-800/80 bg-zinc-950/60 p-5 backdrop-blur">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono font-medium uppercase tracking-wider text-zinc-500">
-              Edge Infrastructure
+              Allocated Disk
             </span>
             <HardDrive className="h-4 w-4 text-zinc-400" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-white">100%</span>
-            <span className="text-xs font-mono text-emerald-400">99.98% SLA</span>
+            <span className="text-2xl font-bold font-mono text-white">
+              {loading ? "--" : `${(totalDisk / 1024).toFixed(1)} GB`}
+            </span>
+            <span className="text-xs font-mono text-zinc-400">NVMe storage</span>
           </div>
-          <div className="mt-2 text-[11px] font-mono text-zinc-400 truncate">
-            Primary: US-East-Ashburn
-          </div>
+          <p className="mt-3 text-[11px] font-mono text-zinc-500">Total volume allowance</p>
         </div>
       </div>
 
@@ -306,7 +301,7 @@ export const DashboardOverview: React.FC = () => {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredServers.map((server) => {
-              const fullIp = `${server.allocation?.ip || "edge.kinetic.host"}:${server.allocation?.port || 25565}`
+              const fullIp = server.allocation ? `${server.allocation.ip}:${server.allocation.port}` : "Not configured"
               const isBusy = powerLoading[server.id]
 
               return (

@@ -1,29 +1,25 @@
 // ============================================================
 // KineticHost — API Service Index
-// Exports mock or real API depending on environment
+// Exports real API service modules using ApiClient
 // ============================================================
 
-// For now, we always use the mock API. When a real backend exists,
-// this file becomes the single point to swap implementations.
-//
-// Usage: import { auth, servers, files, ... } from "@/lib/api"
-//
-// To switch to real API, create real implementations in each
-// service file and conditionally export based on VITE_USE_MOCK_API.
+// All services communicate with the backend via ApiClient.
+// No mock handlers are imported or used in production.
 
-export {
-  mockAuth as auth,
-  mockServerApi as servers,
-  mockFileApi as files,
-  mockBackupApi as backups,
-  mockDatabaseApi as databases,
-  mockScheduleApi as schedules,
-  mockNodeApi as nodes,
-  mockAllocationApi as allocations,
-  mockEggApi as eggs,
-  mockUserApi as users,
-  mockAccountApi as account,
-  mockStartupApi as startup,
-  mockSubuserApi as subusers,
-  mockAdminApi as admin,
-} from "@/lib/mock/handlers"
+export { authApi as auth } from "./auth"
+export { serverApi as servers } from "./servers"
+export { fileApi as files } from "./files"
+export { backupApi as backups } from "./backups"
+export { databaseApi as databases } from "./databases"
+export { scheduleApi as schedules } from "./schedules"
+export { nodeApi as nodes } from "./nodes"
+export { allocationApi as allocations } from "./allocations"
+export { eggApi as eggs } from "./eggs"
+export { userApi as users } from "./users"
+export { accountApi as account } from "./account"
+export { startupApi as startup } from "./startup"
+export { subuserApi as subusers } from "./subusers"
+export { adminApi as admin } from "./admin"
+
+// Re-export the client for direct use if needed
+export { apiClient } from "./client"

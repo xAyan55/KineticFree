@@ -118,7 +118,7 @@ export const ServerList: React.FC = () => {
         <div className="overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-950/60">
           <div className="divide-y divide-zinc-800/60">
             {filtered.map((server) => {
-              const fullIp = `${server.allocation?.ip || "edge.kinetic.host"}:${server.allocation?.port || 25565}`
+              const fullIp = server.allocation ? `${server.allocation.ip}:${server.allocation.port}` : "Not configured"
               const isRunning = server.status === "running"
               return (
                 <div

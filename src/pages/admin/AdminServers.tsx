@@ -79,8 +79,13 @@ export const AdminServers: React.FC = () => {
 
       {/* Fleet Table */}
       <div className="overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-950/60 shadow-xl">
-        <div className="divide-y divide-zinc-800/60">
-          {filtered.map((server) => {
+        {filtered.length === 0 ? (
+          <div className="p-8 text-center text-xs font-mono text-zinc-500">
+            No server instances found.
+          </div>
+        ) : (
+          <div className="divide-y divide-zinc-800/60">
+            {filtered.map((server) => {
             const isSuspended = server.status === "suspended"
             const isRunning = server.status === "running"
 
@@ -160,6 +165,7 @@ export const AdminServers: React.FC = () => {
             )
           })}
         </div>
+      )}
       </div>
     </div>
   )

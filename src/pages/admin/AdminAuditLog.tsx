@@ -68,33 +68,39 @@ export const AdminAuditLog: React.FC = () => {
           <div className="col-span-3 sm:col-span-4 text-right sm:text-left">Target & IP</div>
         </div>
 
-        <div className="divide-y divide-zinc-800/60 text-xs font-mono">
-          {filtered.map((event) => (
-            <div
-              key={event.id}
-              className="grid grid-cols-12 items-center px-4 py-3 hover:bg-zinc-900/40 transition-colors"
-            >
-              <div className="col-span-3 sm:col-span-2 text-zinc-400 text-[11px]">
-                {new Date(event.createdAt).toLocaleString()}
-              </div>
+        {filtered.length === 0 ? (
+          <div className="p-8 text-center text-xs font-mono text-zinc-500">
+            No audit activity recorded.
+          </div>
+        ) : (
+          <div className="divide-y divide-zinc-800/60 text-xs font-mono">
+            {filtered.map((event) => (
+              <div
+                key={event.id}
+                className="grid grid-cols-12 items-center px-4 py-3 hover:bg-zinc-900/40 transition-colors"
+              >
+                <div className="col-span-3 sm:col-span-2 text-zinc-400 text-[11px]">
+                  {new Date(event.createdAt).toLocaleString()}
+                </div>
 
-              <div className="col-span-3 sm:col-span-3 text-white font-bold truncate pr-2">
-                {event.actorName}
-              </div>
+                <div className="col-span-3 sm:col-span-3 text-white font-bold truncate pr-2">
+                  {event.actorName}
+                </div>
 
-              <div className="col-span-3 sm:col-span-3">
-                <Badge variant="zinc" className="text-[10px] py-0 px-1.5 font-mono">
-                  {event.action}
-                </Badge>
-              </div>
+                <div className="col-span-3 sm:col-span-3">
+                  <Badge variant="zinc" className="text-[10px] py-0 px-1.5 font-mono">
+                    {event.action}
+                  </Badge>
+                </div>
 
-              <div className="col-span-3 sm:col-span-4 text-right sm:text-left text-zinc-400">
-                <span className="text-zinc-200">{event.targetName || event.targetId}</span>
-                <span className="text-zinc-600 ml-2 hidden sm:inline">({event.ip})</span>
+                <div className="col-span-3 sm:col-span-4 text-right sm:text-left text-zinc-400">
+                  <span className="text-zinc-200">{event.targetName || event.targetId}</span>
+                  <span className="text-zinc-600 ml-2 hidden sm:inline">({event.ip})</span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

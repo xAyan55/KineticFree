@@ -170,9 +170,13 @@ export const ServerSettings: React.FC = () => {
             </Button>
             <Button
               type="button"
-              onClick={() => {
+              onClick={async () => {
                 setReinstallOpen(false)
-                alert("Simulated: Reinstalling server package.")
+                try {
+                  await serverApi.reinstall(id!)
+                } catch (err: any) {
+                  alert(err.message || "Failed to reinstall server.")
+                }
               }}
               className="bg-amber-500 text-black hover:bg-amber-400 text-xs font-mono font-bold"
             >

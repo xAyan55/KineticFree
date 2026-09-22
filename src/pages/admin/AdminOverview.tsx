@@ -51,11 +51,8 @@ export const AdminOverview: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-white font-mono sm:text-3xl">
-              SYSTEM ADMINISTRATION
+              System Administration
             </h1>
-            <Badge variant="warning" className="text-[10px] font-mono">
-              ROOT CONSOLE
-            </Badge>
           </div>
           <p className="mt-1 text-xs text-zinc-400 font-mono">
             Platform health, cluster capacity metrics, and administrative audit logs
@@ -203,23 +200,29 @@ export const AdminOverview: React.FC = () => {
           </Button>
         </div>
 
-        <div className="divide-y divide-zinc-800/60 font-mono text-xs">
-          {recentAudits.map((event) => (
-            <div key={event.id} className="flex flex-col sm:flex-row sm:items-center justify-between py-2.5 gap-2">
-              <div className="flex items-center gap-2.5">
-                <span className="text-white font-bold">{event.actorName}</span>
-                <span className="text-zinc-500">executed</span>
-                <Badge variant="zinc" className="text-[10px] py-0">
-                  {event.action}
-                </Badge>
-                <span className="text-zinc-400 truncate max-w-[200px]">on {event.targetName || event.targetId}</span>
+        {recentAudits.length === 0 ? (
+          <div className="py-6 text-center text-xs font-mono text-zinc-500">
+            No recent administrative events recorded.
+          </div>
+        ) : (
+          <div className="divide-y divide-zinc-800/60 font-mono text-xs">
+            {recentAudits.map((event) => (
+              <div key={event.id} className="flex flex-col sm:flex-row sm:items-center justify-between py-2.5 gap-2">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-white font-bold">{event.actorName}</span>
+                  <span className="text-zinc-500">executed</span>
+                  <Badge variant="zinc" className="text-[10px] py-0">
+                    {event.action}
+                  </Badge>
+                  <span className="text-zinc-400 truncate max-w-[200px]">on {event.targetName || event.targetId}</span>
+                </div>
+                <div className="text-[11px] text-zinc-500">
+                  IP: {event.ip} • {new Date(event.createdAt).toLocaleTimeString()}
+                </div>
               </div>
-              <div className="text-[11px] text-zinc-500">
-                IP: {event.ip} • {new Date(event.createdAt).toLocaleTimeString()}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

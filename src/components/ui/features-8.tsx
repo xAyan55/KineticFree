@@ -127,7 +127,7 @@ export function Features() {
                   Always-On DDoS Shield
                 </h3>
                 <p className="text-zinc-400 text-xs leading-relaxed">
-                  Enterprise 12 Tbps multi-layer mitigation specifically tuned for Minecraft traffic. Stops bot raids and crash exploits with 0 tick drops.
+                  Minecraft-tuned DDoS packet filtering with multi-layer mitigation designed specifically for game server traffic. Stops bot raids and crash exploits.
                 </p>
               </div>
             </CardContent>
@@ -139,15 +139,15 @@ export function Features() {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono text-zinc-400 uppercase tracking-wider">Tick Performance</span>
                 <span className="text-[11px] font-mono text-white bg-white/10 border border-white/20 px-2 py-0.5 rounded">
-                  20.0 TPS Solid
+                  Optimized
                 </span>
               </div>
 
-              {/* TPS Live Waveform Preview */}
+              {/* Performance Visualization */}
               <div className="my-6 rounded-lg border border-white/10 bg-black/60 p-3.5 space-y-2">
                 <div className="flex justify-between items-baseline text-xs">
-                  <span className="text-zinc-400 font-mono">MSPT: 12.4ms</span>
-                  <span className="text-white font-mono font-bold">20.0 / 20.0</span>
+                  <span className="text-zinc-400 font-mono">Server Grade</span>
+                  <span className="text-white font-mono font-bold">High Performance</span>
                 </div>
                 <div className="h-12 w-full flex items-end gap-1 px-1">
                   {[85, 90, 88, 92, 95, 94, 98, 92, 96, 95, 93, 97, 99, 95, 98, 96, 94, 97, 99, 98].map((val, i) => (
@@ -159,8 +159,8 @@ export function Features() {
                   ))}
                 </div>
                 <div className="flex justify-between items-center text-[10px] text-zinc-500 font-mono pt-1 border-t border-white/5">
-                  <span>AMD Ryzen 9</span>
-                  <span>Gen4 NVMe</span>
+                  <span>Modern CPU</span>
+                  <span>NVMe Storage</span>
                 </div>
               </div>
 
@@ -169,7 +169,7 @@ export function Features() {
                   Instant Chunk Generation
                 </h3>
                 <p className="text-zinc-400 text-xs leading-relaxed">
-                  High-clock Ryzen processors ensure fluid Elytra flight, lightning chunk loads, and lag-free redstone mega-builds.
+                  High-performance processors paired with NVMe storage ensure fluid Elytra flight, fast chunk generation, and lag-free redstone builds.
                 </p>
               </div>
             </CardContent>
@@ -187,7 +187,7 @@ export function Features() {
                     1-Click Mod & Plugin Hub
                   </h3>
                   <p className="text-zinc-400 text-xs mt-2 leading-relaxed">
-                    Browse and install over 10,000+ modpacks and plugins directly from Modrinth, CurseForge, and SpigotMC with one click.
+                    Support for Paper, Purpur, Fabric, Forge, Vanilla, and Velocity server JARs. Compatible with Modrinth, CurseForge, and SpigotMC software.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-zinc-400 font-mono">
@@ -196,25 +196,25 @@ export function Features() {
                 </div>
               </div>
 
-              {/* Plugin List Simulation */}
+              {/* Supported Software Ecosystem */}
               <div className="space-y-2 rounded-lg border border-white/10 bg-black/60 p-2.5 sm:p-3">
                 <div className="text-[11px] font-mono text-zinc-400 pb-1.5 border-b border-white/5 flex justify-between">
-                  <span>Installed Software</span>
-                  <span className="text-zinc-300">Up to date</span>
+                  <span>Supported Software</span>
+                  <span className="text-zinc-300">Ecosystem</span>
                 </div>
                 {[
-                  { name: "EssentialsX", ver: "2.21.0", type: "Plugin" },
-                  { name: "GeyserMC (Bedrock)", ver: "2.4.2", type: "Crossplay" },
-                  { name: "WorldEdit", ver: "7.3.0", type: "Tool" },
-                  { name: "VoiceChat (Simple Voice)", ver: "2.5.12", type: "Mod" },
+                  { name: "Paper / Purpur", ver: "1.8 – 1.21+", type: "Server JAR" },
+                  { name: "Fabric / Forge", ver: "All Versions", type: "Modded" },
+                  { name: "Velocity / BungeeCord", ver: "Latest", type: "Proxy" },
+                  { name: "Vanilla / Snapshot", ver: "All Versions", type: "Official" },
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center justify-between gap-2 p-2 rounded bg-zinc-900/60 border border-white/5 text-xs">
                     <div className="min-w-0">
                       <div className="font-medium text-zinc-200 truncate">{item.name}</div>
-                      <div className="text-[10px] text-zinc-500 font-mono">v{item.ver}</div>
+                      <div className="text-[10px] text-zinc-500 font-mono">{item.ver}</div>
                     </div>
                     <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-white border border-white/20 font-mono whitespace-nowrap">
-                      Active
+                      {item.type}
                     </span>
                   </div>
                 ))}
@@ -243,33 +243,27 @@ export function Features() {
                 </div>
               </div>
 
-              {/* Sub-users Avatar Cards */}
+              {/* Permission Roles Architecture */}
               <div className="space-y-2 rounded-lg border border-white/10 bg-black/60 p-2.5 sm:p-3">
                 <div className="text-[11px] font-mono text-zinc-400 pb-1.5 border-b border-white/5 flex items-center justify-between">
-                  <span>Server Team</span>
+                  <span>Permission Roles</span>
                   <span className="flex items-center gap-1.5 text-zinc-300 text-[10.5px]">
-                    <span className="size-1.5 rounded-full bg-white animate-pulse"></span>
-                    3 Online
+                    Granular Access
                   </span>
                 </div>
                 {[
-                  { name: "Alex_SMP", role: "Server Owner", avatar: "MHF_Alex", perm: "Full Access" },
-                  { name: "SteveCraft", role: "Administrator", avatar: "MHF_Steve", perm: "Console & Files" },
-                  { name: "NotchHero", role: "Moderator", avatar: "Notch", perm: "Restart Only" },
+                  { role: "Owner", icon: "👑", perm: "Full Access" },
+                  { role: "Administrator", icon: "🛡️", perm: "Console & Files" },
+                  { role: "Moderator", icon: "⚙️", perm: "Restart Only" },
                 ].map((member, idx) => (
                   <div
                     key={idx}
                     className="flex items-center justify-between gap-2.5 p-2 rounded bg-zinc-900/70 border border-white/5 text-xs transition-colors hover:border-white/15"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <img
-                        className="size-7 shrink-0 rounded-sm border border-white/20 bg-zinc-800"
-                        src={`https://minotar.net/avatar/${member.avatar}/64.png`}
-                        alt={member.name}
-                      />
+                      <span className="text-lg shrink-0">{member.icon}</span>
                       <div className="min-w-0">
-                        <div className="font-mono text-xs text-zinc-200 font-medium truncate">{member.name}</div>
-                        <div className="text-[10px] text-zinc-400 truncate">{member.role}</div>
+                        <div className="font-mono text-xs text-zinc-200 font-medium truncate">{member.role}</div>
                       </div>
                     </div>
                     <span className="shrink-0 text-[10px] font-mono text-zinc-200 bg-white/10 px-2 py-0.5 rounded border border-white/20 whitespace-nowrap">

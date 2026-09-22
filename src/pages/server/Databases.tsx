@@ -31,6 +31,8 @@ export const Databases: React.FC = () => {
   const [newDbName, setNewDbName] = useState("")
   const [deleteTarget, setDeleteTarget] = useState<Database | null>(null)
   const [showPassword, setShowPassword] = useState<Record<string, boolean>>({})
+  const [revealedPasswords, setRevealedPasswords] = useState<Record<string, string>>({})
+  const [resettingId, setResettingId] = useState<string | null>(null)
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
   useEffect(() => {
@@ -52,9 +54,13 @@ export const Databases: React.FC = () => {
     e.preventDefault()
     if (!newDbName.trim() || !id) return
     try {
-      await dbApi.create(id, newDbName.trim())
+      const newDb = await dbApi.create(id, newDbName.trim())
       setCreateOpen(false)
       setNewDbName("")
+      if (newDb.password) {
+        setRevealedPasswords((prev) => ({ ...prev, [newDb.id]: newDb.password! }))
+        setShowPassword((prev) => ({ ...prev, [newDb.id]: true }))
+      }
       loadDatabases()
     } catch (err) {
       console.error(err)
@@ -69,6 +75,20 @@ export const Databases: React.FC = () => {
       loadDatabases()
     } catch (err) {
       console.error(err)
+    }
+  }
+
+  const handleResetPassword = async (dbId: string) => {
+    if (!id) return
+    try {
+      setResettingId(dbId)
+      const res = await dbApi.resetPassword(id, dbId)
+      setRevealedPasswords((prev) => ({ ...prev, [dbId]: res.password }))
+      setShowPassword((prev) => ({ ...prev, [dbId]: true }))
+    } catch (err: any) {
+      alert(err.message || "Failed to reset database password")
+    } finally {
+      setResettingId(null)
     }
   }
 
@@ -122,7 +142,7 @@ export const Databases: React.FC = () => {
         <div className="grid gap-4 md:grid-cols-2">
           {databases.map((db) => {
             const isVisible = showPassword[db.id]
-            const mockPassword = `kh_pwd_${db.id}_sec`
+            const activePassword = revealedPasswords[db.id] || db.password
 
             return (
               <div
@@ -136,7 +156,7 @@ export const Databases: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-sm text-white font-mono">{db.name}</h3>
-                      <span className="text-[10px] text-emerald-400 font-mono uppercase">Online • MariaDB</span>
+                      <span className="text-[10px] text-zinc-400 font-mono uppercase">MariaDB / MySQL</span>
                     </div>
                   </div>
 
@@ -172,18 +192,36 @@ export const Databases: React.FC = () => {
                   <div className="flex items-center justify-between py-2">
                     <span className="text-zinc-500">Password</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-zinc-200 select-all">
-                        {isVisible ? mockPassword : "••••••••••••••••"}
-                      </span>
-                      <button
-                        onClick={() => setShowPassword((prev) => ({ ...prev, [db.id]: !isVisible }))}
-                        className="text-zinc-500 hover:text-white"
-                      >
-                        {isVisible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                      </button>
-                      <button onClick={() => copyVal(mockPassword, `pwd_${db.id}`)} className="text-zinc-500 hover:text-white">
-                        {copiedKey === `pwd_${db.id}` ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
-                      </button>
+                      {activePassword ? (
+                        <>
+                          <span className="text-zinc-200 select-all">
+                            {isVisible ? activePassword : "••••••••••••••••"}
+                          </span>
+                          <button
+                            onClick={() => setShowPassword((prev) => ({ ...prev, [db.id]: !isVisible }))}
+                            className="text-zinc-500 hover:text-white"
+                          >
+                            {isVisible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                          </button>
+                          <button onClick={() => copyVal(activePassword, `pwd_${db.id}`)} className="text-zinc-500 hover:text-white">
+                            {copiedKey === `pwd_${db.id}` ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                          </button>
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="text-zinc-500">••••••••••••••••</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleResetPassword(db.id)}
+                            disabled={resettingId === db.id}
+                            className="h-6 text-[10px] font-mono border-zinc-800 hover:bg-zinc-800 text-zinc-300 px-2 gap-1"
+                          >
+                            <RotateCw className={`h-3 w-3 ${resettingId === db.id ? "animate-spin" : ""}`} />
+                            Reset Password
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

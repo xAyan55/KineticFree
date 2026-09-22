@@ -50,7 +50,9 @@ export const Network: React.FC = () => {
         <Button
           size="sm"
           disabled={allAllocations.length >= 2}
-          onClick={() => alert("Simulated: Extra port assigned to server container.")}
+          onClick={() => {
+            // TODO: Implement via POST /api/servers/:id/allocations when backend supports it
+          }}
           className="bg-white text-black hover:bg-zinc-200 text-xs font-mono font-semibold h-9"
         >
           <Plus className="h-4 w-4 mr-1.5" />

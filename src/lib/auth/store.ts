@@ -32,9 +32,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const user = await authApi.login(credentials)
       set({ user, isLoading: false })
-      try {
-        localStorage.setItem("kinetichost_session", JSON.stringify(user))
-      } catch {}
       return true
     } catch (err: any) {
       set({
@@ -50,9 +47,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const user = await authApi.register(credentials)
       set({ user, isLoading: false })
-      try {
-        localStorage.setItem("kinetichost_session", JSON.stringify(user))
-      } catch {}
       return true
     } catch (err: any) {
       set({
@@ -68,9 +62,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await authApi.logout()
     } finally {
-      try {
-        localStorage.removeItem("kinetichost_session")
-      } catch {}
       set({ user: null, isLoading: false })
     }
   },
@@ -78,30 +69,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   checkSession: async () => {
     set({ isLoading: true })
     try {
-      // First check local storage cache for instant hydration
-      const cached = localStorage.getItem("kinetichost_session")
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached)
-          set({ user: parsed })
-        } catch {}
-      }
-
       const user = await authApi.getSession()
-      if (user) {
-        set({ user, isInitialized: true, isLoading: false })
-        localStorage.setItem("kinetichost_session", JSON.stringify(user))
-      } else if (cached) {
-        // Mock fallback: if mock state reset on reload, keep cached user
-        try {
-          const parsed = JSON.parse(cached)
-          set({ user: parsed, isInitialized: true, isLoading: false })
-        } catch {
-          set({ user: null, isInitialized: true, isLoading: false })
-        }
-      } else {
-        set({ user: null, isInitialized: true, isLoading: false })
-      }
+      set({ user: user ?? null, isInitialized: true, isLoading: false })
     } catch {
       set({ user: null, isInitialized: true, isLoading: false })
     }

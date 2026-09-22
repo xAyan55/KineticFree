@@ -55,9 +55,9 @@ const SOFTWARE_OPTIONS = [
 ]
 
 const LOCATIONS = [
-  { id: "node_1", name: "US-East (Ashburn, VA)", ping: "24ms", hardware: "Ryzen 9 7950X" },
-  { id: "node_2", name: "EU-Central (Frankfurt, DE)", ping: "89ms", hardware: "Ryzen 9 7950X" },
-  { id: "node_3", name: "AP-East (Tokyo, JP)", ping: "140ms", hardware: "EPYC 9654" },
+  { id: "us-east", name: "US-East (Ashburn, VA)", region: "North America", tier: "High-Performance NVMe" },
+  { id: "eu-central", name: "EU-Central (Frankfurt, DE)", region: "Europe", tier: "High-Performance NVMe" },
+  { id: "ap-east", name: "AP-East (Tokyo, JP)", region: "Asia Pacific", tier: "High-Performance NVMe" },
 ]
 
 export const CreateServer: React.FC = () => {
@@ -248,12 +248,12 @@ export const CreateServer: React.FC = () => {
                     <span className="font-bold text-xs text-white font-mono">
                       {loc.name}
                     </span>
-                    <span className="font-mono text-[10px] text-emerald-400">
-                      {loc.ping}
+                    <span className="font-mono text-[10px] text-zinc-400">
+                      {loc.region}
                     </span>
                   </div>
                   <p className="mt-1 text-[11px] text-zinc-500 font-mono">
-                    {loc.hardware}
+                    {loc.tier}
                   </p>
                 </div>
               )

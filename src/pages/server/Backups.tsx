@@ -182,7 +182,14 @@ export const Backups: React.FC = () => {
                       size="sm"
                       variant="outline"
                       disabled={!isCompleted}
-                      onClick={() => alert(`Simulated downloading backup: ${bak.name}.tar.gz`)}
+                      onClick={async () => {
+                        try {
+                          const { downloadUrl } = await backupApi.getDownloadUrl(id!, bak.id)
+                          window.open(downloadUrl, "_blank")
+                        } catch (err: any) {
+                          alert(err.message || "Failed to get download URL.")
+                        }
+                      }}
                       className="h-8 text-xs font-mono border-zinc-800 hover:bg-zinc-800 text-zinc-300"
                     >
                       <Download className="h-3.5 w-3.5" />

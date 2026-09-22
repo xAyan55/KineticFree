@@ -31,7 +31,7 @@ export const Console: React.FC = () => {
   const logEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Poll resources and stream simulated logs
+  // Poll resources and load real console history
   useEffect(() => {
     if (!id) return
 
@@ -42,43 +42,36 @@ export const Console: React.FC = () => {
         const res = await serverApi.getResources(id)
         if (active) setResources(res)
       } catch (err) {
-        console.error(err)
+        if (active) setResources(null)
+      }
+    }
+
+    // Fetch real console history from backend
+    const fetchLogs = async () => {
+      try {
+        const history = await serverApi.getConsoleHistory(id)
+        if (active) setLogs(history)
+      } catch (err) {
+        if (active) {
+          setLogs([{
+            id: "sys-err",
+            content: "[SYSTEM]: Console disconnected — unable to reach backend.",
+            timestamp: new Date().toISOString(),
+            type: "system",
+          }])
+        }
       }
     }
 
     fetchResources()
-    const resInterval = setInterval(fetchResources, 2000)
+    fetchLogs()
 
-    // Initial log messages
-    const initialLogs: ConsoleMessage[] = [
-      { id: "1", content: `[10:00:01 INFO]: Environment: ${server.softwareName} ${server.softwareVersion}`, timestamp: new Date().toISOString(), type: "output" },
-      { id: "2", content: `[10:00:02 INFO]: Allocating ${server.limits.memory}MB JVM memory pool`, timestamp: new Date().toISOString(), type: "output" },
-      { id: "3", content: `[10:00:03 INFO]: Loading world container "world"...`, timestamp: new Date().toISOString(), type: "output" },
-      { id: "4", content: `[10:00:06 INFO]: Preparing spawn area: 98%`, timestamp: new Date().toISOString(), type: "output" },
-      { id: "5", content: `[10:00:08 INFO]: [${server.softwareName}] Loaded 12 core event listeners`, timestamp: new Date().toISOString(), type: "output" },
-      { id: "6", content: `[10:00:10 INFO]: Done (4.182s)! For help, type "help"`, timestamp: new Date().toISOString(), type: "output" },
-      { id: "7", content: `[10:00:11 INFO]: Starting KineticHost RCON & Query listener on :${server.allocation?.port || 25565}`, timestamp: new Date().toISOString(), type: "output" },
-    ]
-
-    if (server.status === "running") {
-      initialLogs.push(
-        { id: "8", content: `[10:01:22 INFO]: Player Ayan joined the game`, timestamp: new Date().toISOString(), type: "output" },
-        { id: "9", content: `[10:02:05 INFO]: <Ayan> KineticHost high-tick performance online!`, timestamp: new Date().toISOString(), type: "output" }
-      )
-    } else {
-      initialLogs.push({
-        id: "8",
-        content: `[10:05:00 INFO]: Server process is currently stopped. Press Start to launch.`,
-        timestamp: new Date().toISOString(),
-        type: "output",
-      })
-    }
-
-    setLogs(initialLogs)
+    // Only poll resources while server is running
+    const resInterval = server.status === "running" ? setInterval(fetchResources, 3000) : null
 
     return () => {
       active = false
-      clearInterval(resInterval)
+      if (resInterval) clearInterval(resInterval)
     }
   }, [id, server.status, server.limits.memory, server.softwareName, server.softwareVersion, server.allocation?.port])
 
@@ -111,32 +104,8 @@ export const Console: React.FC = () => {
 
     try {
       await serverApi.sendCommand(id, cmd)
-
-      // Mock console responses
-      setTimeout(() => {
-        let resp = `[INFO]: Executed command: ${cmd}`
-        if (cmd === "list") {
-          resp = `[INFO]: There are 1 of 20 players online: Ayan`
-        } else if (cmd === "tps") {
-          resp = `[INFO]: TPS from last 1m, 5m, 15m: 20.00, 20.00, 20.00`
-        } else if (cmd.startsWith("say ")) {
-          resp = `[INFO]: [Server] ${cmd.replace("say ", "")}`
-        } else if (cmd === "save-all") {
-          resp = `[INFO]: Saving the game (all chunks flushed to NVMe disk)`
-        } else if (cmd === "help") {
-          resp = `[INFO]: Available commands: help, list, tps, say <msg>, save-all, reload, stop`
-        }
-
-        setLogs((prev) => [
-          ...prev,
-          {
-            id: (Date.now() + 1).toString(),
-            content: resp,
-            timestamp: new Date().toISOString(),
-            type: "output",
-          },
-        ])
-      }, 300)
+      // Real output will arrive via console stream or next poll.
+      // Do NOT fabricate any local response.
     } catch (err: any) {
       setLogs((prev) => [
         ...prev,
@@ -193,10 +162,12 @@ export const Console: React.FC = () => {
     return <span className="text-zinc-300">{text}</span>
   }
 
-  const memUsedMb = resources ? (resources.memoryUsage / 1024 / 1024).toFixed(0) : "0"
+  const isOnline = server.status === "running"
+  const telemetryAvailable = isOnline && resources !== null
+  const memUsedMb = telemetryAvailable ? (resources.memoryUsage / 1024 / 1024).toFixed(0) : "—"
   const memLimitMb = server.limits.memory || 2048
-  const cpuPercent = resources ? resources.cpuUsage.toFixed(1) : "0.0"
-  const diskUsedMb = resources ? (resources.diskUsage / 1024 / 1024).toFixed(0) : "0"
+  const cpuPercent = telemetryAvailable ? resources.cpuUsage.toFixed(1) : "—"
+  const diskUsedMb = telemetryAvailable ? (resources.diskUsage / 1024 / 1024).toFixed(0) : "—"
   const diskLimitMb = server.limits.disk || 10240
 
   return (
@@ -209,7 +180,7 @@ export const Console: React.FC = () => {
               <Activity className="h-3.5 w-3.5 text-zinc-400" />
               MEMORY
             </span>
-            <span className="text-zinc-200 font-bold">{memUsedMb} MB / {memLimitMb} MB</span>
+            <span className="text-zinc-200 font-bold">{telemetryAvailable ? `${memUsedMb} MB / ${memLimitMb} MB` : "Telemetry unavailable"}</span>
           </div>
           <div className="mt-2 h-1.5 w-full rounded-full bg-zinc-900 overflow-hidden">
             <div
@@ -225,7 +196,7 @@ export const Console: React.FC = () => {
               <Cpu className="h-3.5 w-3.5 text-zinc-400" />
               CPU USAGE
             </span>
-            <span className="text-zinc-200 font-bold">{cpuPercent}% / {server.limits.cpu}%</span>
+            <span className="text-zinc-200 font-bold">{telemetryAvailable ? `${cpuPercent}% / ${server.limits.cpu}%` : "Telemetry unavailable"}</span>
           </div>
           <div className="mt-2 h-1.5 w-full rounded-full bg-zinc-900 overflow-hidden">
             <div
@@ -241,7 +212,7 @@ export const Console: React.FC = () => {
               <HardDrive className="h-3.5 w-3.5 text-zinc-400" />
               STORAGE
             </span>
-            <span className="text-zinc-200 font-bold">{diskUsedMb} MB / {diskLimitMb} MB</span>
+            <span className="text-zinc-200 font-bold">{telemetryAvailable ? `${diskUsedMb} MB / ${diskLimitMb} MB` : "Telemetry unavailable"}</span>
           </div>
           <div className="mt-2 h-1.5 w-full rounded-full bg-zinc-900 overflow-hidden">
             <div
@@ -257,11 +228,11 @@ export const Console: React.FC = () => {
               <Wifi className="h-3.5 w-3.5 text-zinc-400" />
               NETWORK I/O
             </span>
-            <span className="text-emerald-400 font-mono text-[11px]">Active</span>
+            <span className={`font-mono text-[11px] ${telemetryAvailable ? "text-emerald-400" : "text-zinc-500"}`}>{telemetryAvailable ? "Active" : "Unavailable"}</span>
           </div>
           <div className="mt-2 text-xs font-mono text-zinc-300 flex justify-between">
-            <span>Rx: 1.4 MB/s</span>
-            <span>Tx: 3.8 MB/s</span>
+            <span>Rx: {telemetryAvailable ? `${((resources.networkRx || 0) / 1024 / 1024).toFixed(1)} MB` : "—"}</span>
+            <span>Tx: {telemetryAvailable ? `${((resources.networkTx || 0) / 1024 / 1024).toFixed(1)} MB` : "—"}</span>
           </div>
         </div>
       </div>

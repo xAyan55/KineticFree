@@ -81,14 +81,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu, isAdminView = 
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Node status indicator */}
-        <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full bg-zinc-900/80 border border-zinc-800 text-xs font-mono text-zinc-400">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          <span className="text-[11px] text-zinc-300">Kinetic-US-01 Online</span>
-        </div>
 
         {!isAdminView && (
           <Button

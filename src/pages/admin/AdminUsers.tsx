@@ -105,8 +105,13 @@ export const AdminUsers: React.FC = () => {
 
       {/* User Table */}
       <div className="overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-950/60 shadow-xl">
-        <div className="divide-y divide-zinc-800/60">
-          {filtered.map((user) => (
+        {filtered.length === 0 ? (
+          <div className="p-8 text-center text-xs font-mono text-zinc-500">
+            No registered users found.
+          </div>
+        ) : (
+          <div className="divide-y divide-zinc-800/60">
+            {filtered.map((user) => (
             <div
               key={user.id}
               className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-zinc-900/40 transition-colors gap-4"
@@ -169,6 +174,7 @@ export const AdminUsers: React.FC = () => {
             </div>
           ))}
         </div>
+      )}
       </div>
 
       {/* Delete User Modal */}

@@ -176,7 +176,9 @@ export const AccountSecurity: React.FC = () => {
         <Button
           type="button"
           variant="outline"
-          onClick={() => alert("Simulated: 2FA Setup QR code displayed.")}
+          onClick={() => {
+            // TODO: Implement via POST /api/account/2fa/enable when backend supports it
+          }}
           className="border-zinc-800 text-xs font-mono hover:bg-zinc-800"
         >
           Configure Authenticator App

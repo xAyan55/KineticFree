@@ -59,7 +59,7 @@ export const ServerLayout: React.FC = () => {
 
   const handleCopyIp = () => {
     if (!server) return
-    const ip = `${server.allocation?.ip || "edge.kinetic.host"}:${server.allocation?.port || 25565}`
+    const ip = server.allocation ? `${server.allocation.ip}:${server.allocation.port}` : "Not configured"
     navigator.clipboard.writeText(ip)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -70,22 +70,11 @@ export const ServerLayout: React.FC = () => {
     setActionLoading(true)
     try {
       await serverApi.sendPowerAction(server.id, action)
-      // optimistic update
-      const stateMap: Record<string, Server["status"]> = {
-        start: "starting",
-        stop: "stopping",
-        restart: "restarting",
-        kill: "offline",
+      // Refresh server state from backend after a short delay
+      if (id) {
+        const fresh = await serverApi.get(id)
+        setServer(fresh)
       }
-      setServer((prev) => (prev ? { ...prev, status: stateMap[action] || prev.status } : null))
-
-      // Refresh real state shortly
-      setTimeout(async () => {
-        if (id) {
-          const fresh = await serverApi.get(id)
-          setServer(fresh)
-        }
-      }, 1500)
     } catch (err) {
       console.error(err)
     } finally {
@@ -133,7 +122,7 @@ export const ServerLayout: React.FC = () => {
 
   const isRunning = server.status === "running"
   const isTransitioning = ["starting", "stopping", "restarting"].includes(server.status)
-  const fullIp = `${server.allocation?.ip || "edge.kinetic.host"}:${server.allocation?.port || 25565}`
+  const fullIp = server.allocation ? `${server.allocation.ip}:${server.allocation.port}` : "Not configured"
 
   return (
     <div className="space-y-6 pb-16">

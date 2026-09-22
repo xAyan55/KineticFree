@@ -184,8 +184,8 @@ PasswordInput.displayName = "PasswordInput";
 function SignInForm() {
   const navigate = useNavigate();
   const { login, isLoading, error } = useAuthStore();
-  const [email, setEmail] = useState("ayan@kinetic.host");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -240,26 +240,7 @@ function SignInForm() {
         </Button>
       </div>
 
-      {/* Quick Demo Credentials */}
-      <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3 space-y-2">
-        <span className="text-[10px] font-mono uppercase text-zinc-500 block">Quick Demo Logins:</span>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => { setEmail("ayan@kinetic.host"); setPassword("password123"); }}
-            className="flex-1 rounded bg-zinc-900 border border-zinc-800 py-1 text-[11px] font-mono text-zinc-300 hover:text-white hover:border-zinc-700"
-          >
-            Admin (Ayan)
-          </button>
-          <button
-            type="button"
-            onClick={() => { setEmail("user@kinetic.host"); setPassword("password123"); }}
-            className="flex-1 rounded bg-zinc-900 border border-zinc-800 py-1 text-[11px] font-mono text-zinc-300 hover:text-white hover:border-zinc-700"
-          >
-            Regular User
-          </button>
-        </div>
-      </div>
+
     </form>
   );
 }

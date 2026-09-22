@@ -221,7 +221,7 @@ export function Hero({ onOpenDashboard }: HeroProps = {}) {
             <rect x="13.4" y="2.6" width="7.2" height="18.8" rx="3.6" fill="url(#stat-pill-right-r)" />
             <rect x="9.2" y="10.9" width="5.6" height="2.2" rx="1.1" fill="#4a4a4a" />
           </svg>
-          <span>500K+ Minecraft servers hosted</span>
+          <span>Always-free Minecraft server hosting</span>
         </div>
 
         <div className="stat inline-flex items-center gap-3.5 text-[13.5px] tracking-[-0.015em] whitespace-nowrap">
@@ -230,7 +230,7 @@ export function Hero({ onOpenDashboard }: HeroProps = {}) {
             <path d="M12 7.1v7.4" stroke="#111111" strokeWidth="1.85" strokeLinecap="round" />
             <path d="M8.15 12.35L12 16.2l3.85-3.85" stroke="#111111" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <span>99.9% Uptime with DDoS Shield</span>
+          <span>DDoS protected server network</span>
         </div>
 
         <div className="stat inline-flex items-center gap-3.5 text-[13.5px] tracking-[-0.015em] whitespace-nowrap">
@@ -251,7 +251,7 @@ export function Hero({ onOpenDashboard }: HeroProps = {}) {
             <circle cx="30.2" cy="11" r="9.2" fill="#f26b1d" />
             <text x="30.2" y="15.1" fontFamily="'Inter', sans-serif" fontWeight="700" fontSize="12.5" textAnchor="middle" fill="#ffffff">e</text>
           </svg>
-          <span>2.4M+ players connected worldwide</span>
+          <span>Full SFTP & custom JAR software support</span>
         </div>
       </footer>
     </div>
