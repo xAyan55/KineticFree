@@ -8,6 +8,8 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Eye, EyeOff, ChevronLeft } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/lib/auth/store";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -180,35 +182,133 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 PasswordInput.displayName = "PasswordInput";
 
 function SignInForm() {
-  const handleSignIn = (event: React.FormEvent<HTMLFormElement>) => { event.preventDefault(); console.log("UI: Sign In form submitted"); };
+  const navigate = useNavigate();
+  const { login, isLoading, error } = useAuthStore();
+  const [email, setEmail] = useState("ayan@kinetic.host");
+  const [password, setPassword] = useState("password123");
+
+  const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const ok = await login({ email, password });
+    if (ok) {
+      navigate("/dashboard");
+    }
+  };
+
   return (
-    <form onSubmit={handleSignIn} autoComplete="on" className="flex flex-col gap-8">
+    <form onSubmit={handleSignIn} autoComplete="on" className="flex flex-col gap-6">
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Sign in to your account</h1>
-        <p className="text-balance text-sm text-muted-foreground">Enter your email below to sign in</p>
+        <h1 className="text-2xl font-bold font-mono text-white">Sign in to KineticHost</h1>
+        <p className="text-balance text-xs text-muted-foreground font-mono">Control Panel and Edge Server Infrastructure</p>
       </div>
+
+      {error && (
+        <div className="rounded-lg border border-rose-500/20 bg-rose-500/10 p-3 text-xs font-mono text-rose-400">
+          {error}
+        </div>
+      )}
+
       <div className="grid gap-4">
-        <div className="grid gap-2"><Label htmlFor="email">Email</Label><Input id="email" name="email" type="email" placeholder="m@example.com" required autoComplete="email" /></div>
-        <PasswordInput name="password" label="Password" required autoComplete="current-password" placeholder="Password" />
-        <Button type="submit" variant="outline" className="mt-2">Sign In</Button>
+        <div className="grid gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="m@example.com"
+            required
+            autoComplete="email"
+          />
+        </div>
+        <PasswordInput
+          name="password"
+          label="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="current-password"
+          placeholder="Password"
+        />
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="mt-2 bg-white text-black hover:bg-zinc-200 font-mono text-xs font-bold h-10"
+        >
+          {isLoading ? "Authenticating..." : "Sign In to Panel"}
+        </Button>
+      </div>
+
+      {/* Quick Demo Credentials */}
+      <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3 space-y-2">
+        <span className="text-[10px] font-mono uppercase text-zinc-500 block">Quick Demo Logins:</span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => { setEmail("ayan@kinetic.host"); setPassword("password123"); }}
+            className="flex-1 rounded bg-zinc-900 border border-zinc-800 py-1 text-[11px] font-mono text-zinc-300 hover:text-white hover:border-zinc-700"
+          >
+            Admin (Ayan)
+          </button>
+          <button
+            type="button"
+            onClick={() => { setEmail("user@kinetic.host"); setPassword("password123"); }}
+            className="flex-1 rounded bg-zinc-900 border border-zinc-800 py-1 text-[11px] font-mono text-zinc-300 hover:text-white hover:border-zinc-700"
+          >
+            Regular User
+          </button>
+        </div>
       </div>
     </form>
   );
 }
 
 function SignUpForm() {
-  const handleSignUp = (event: React.FormEvent<HTMLFormElement>) => { event.preventDefault(); console.log("UI: Sign Up form submitted"); };
+  const navigate = useNavigate();
+  const { register, isLoading, error } = useAuthStore();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const ok = await register({ name, email, password });
+    if (ok) {
+      navigate("/dashboard");
+    }
+  };
+
   return (
-    <form onSubmit={handleSignUp} autoComplete="on" className="flex flex-col gap-8">
+    <form onSubmit={handleSignUp} autoComplete="on" className="flex flex-col gap-6">
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Create an account</h1>
-        <p className="text-balance text-sm text-muted-foreground">Enter your details below to sign up</p>
+        <h1 className="text-2xl font-bold font-mono text-white">Create an account</h1>
+        <p className="text-balance text-xs text-muted-foreground font-mono">Deploy high-tick Minecraft servers for free</p>
       </div>
+
+      {error && (
+        <div className="rounded-lg border border-rose-500/20 bg-rose-500/10 p-3 text-xs font-mono text-rose-400">
+          {error}
+        </div>
+      )}
+
       <div className="grid gap-4">
-        <div className="grid gap-1"><Label htmlFor="name">Full Name</Label><Input id="name" name="name" type="text" placeholder="John Doe" required autoComplete="name" /></div>
-        <div className="grid gap-2"><Label htmlFor="email">Email</Label><Input id="email" name="email" type="email" placeholder="m@example.com" required autoComplete="email" /></div>
-        <PasswordInput name="password" label="Password" required autoComplete="new-password" placeholder="Password"/>
-        <Button type="submit" variant="outline" className="mt-2">Sign Up</Button>
+        <div className="grid gap-1">
+          <Label htmlFor="name">Full Name</Label>
+          <Input id="name" name="name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Steve" required autoComplete="name" />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="steve@minecraft.net" required autoComplete="email" />
+        </div>
+        <PasswordInput name="password" label="Password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password" placeholder="Password"/>
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="mt-2 bg-white text-black hover:bg-zinc-200 font-mono text-xs font-bold h-10"
+        >
+          {isLoading ? "Creating Account..." : "Create Account"}
+        </Button>
       </div>
     </form>
   );
@@ -219,7 +319,7 @@ function AuthFormContainer({ isSignIn, onToggle }: { isSignIn: boolean; onToggle
         <div className="mx-auto grid w-[350px] gap-2">
             <div className="flex items-center gap-2 mb-2 justify-center">
                 <img src="/images/logo.png" alt="KineticHost" className="w-6 h-6 object-contain rounded" />
-                <span className="font-semibold text-lg tracking-tight">KineticHost</span>
+                <span className="font-semibold text-lg tracking-tight font-mono">KineticHost</span>
             </div>
             {isSignIn ? <SignInForm /> : <SignUpForm />}
             <div className="text-center text-sm">
@@ -228,13 +328,6 @@ function AuthFormContainer({ isSignIn, onToggle }: { isSignIn: boolean; onToggle
                     {isSignIn ? "Sign up" : "Sign in"}
                 </Button>
             </div>
-            <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-                <span className="relative z-10 bg-background px-2 text-muted-foreground">Or continue with</span>
-            </div>
-            <Button variant="outline" type="button" onClick={() => console.log("UI: Google button clicked")}>
-                <img src="https://cdn.21st.dev/assets/mirror/38/38146bfd9eff6dbf0d74771f2e625c70d87d3770e0d080dbb6e50db1d5403f46.svg" alt="Google icon" className="mr-2 h-4 w-4" />
-                Continue with Google
-            </Button>
         </div>
     )
 }
@@ -253,6 +346,7 @@ export interface AuthContentProps {
 export interface AuthUIProps {
     signInContent?: AuthContentProps;
     signUpContent?: AuthContentProps;
+    defaultMode?: "signin" | "signup";
     onBack?: () => void;
 }
 
@@ -278,8 +372,8 @@ const defaultSignUpContent = {
     }
 };
 
-export function AuthUI({ signInContent = {}, signUpContent = {}, onBack }: AuthUIProps) {
-  const [isSignIn, setIsSignIn] = useState(true);
+export function AuthUI({ signInContent = {}, signUpContent = {}, defaultMode = "signin", onBack }: AuthUIProps) {
+  const [isSignIn, setIsSignIn] = useState(defaultMode === "signin");
   const toggleForm = () => setIsSignIn((prev) => !prev);
 
   const finalSignInContent = {
