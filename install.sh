@@ -164,7 +164,7 @@ install_dependencies() {
             
             # Identify missing essential tools
             MISSING=()
-            for cmd in curl wget git tar unzip ca-certificates; do
+            for cmd in curl wget git tar unzip ca-certificates make; do
                 if ! command -v "$cmd" >/dev/null 2>&1; then
                     MISSING+=("$cmd")
                 fi
@@ -173,63 +173,58 @@ install_dependencies() {
             if [ ${#MISSING[@]} -gt 0 ]; then
                 log_info "Installing missing utilities: ${MISSING[*]}"
                 apt-get update -qq 2>/dev/null || true
-                for pkg in "${MISSING[@]}"; do
-                    apt-get install -y -qq "$pkg" 2>/dev/null || {
-                        heal_dpkg
-                        apt-get install -y "$pkg" 2>/dev/null || log_warn "Could not install $pkg via apt."
-                    }
-                done
+                apt-get install -y -qq build-essential curl wget git tar unzip ca-certificates 2>/dev/null || true
             else
-                log_info "All core tools (curl, wget, git, tar, unzip) are already present."
+                log_info "All core tools (curl, wget, git, tar, unzip, make) are already present."
             fi
             ;;
         dnf|yum)
             $PKG_MANAGER update -y -q 2>/dev/null || true
-            $PKG_MANAGER install -y -q curl wget git tar unzip ca-certificates 2>/dev/null || true
+            $PKG_MANAGER install -y -q gcc gcc-c++ make curl wget git tar unzip ca-certificates 2>/dev/null || true
             ;;
         pacman)
-            pacman -Sy --noconfirm curl wget git tar unzip ca-certificates 2>/dev/null || true
+            pacman -Sy --noconfirm base-devel curl wget git tar unzip ca-certificates 2>/dev/null || true
             ;;
         apk)
             apk update 2>/dev/null || true
-            apk add curl wget git tar unzip ca-certificates 2>/dev/null || true
+            apk add build-base curl wget git tar unzip ca-certificates 2>/dev/null || true
             ;;
     esac
 
     log_success "System utilities verified."
 }
 
-# --- Install Node.js 20+ LTS ---
+# --- Install Node.js 22+ LTS ---
 install_nodejs() {
     log_step "Checking Node.js & NPM Runtime..."
 
     NODE_READY=false
     if command -v node >/dev/null 2>&1; then
         NODE_VER=$(node -v | sed 's/v//' | cut -d'.' -f1)
-        if [ "$NODE_VER" -ge 20 ]; then
+        if [ "$NODE_VER" -ge 22 ]; then
             NODE_READY=true
             log_info "Node.js $(node -v) is already installed."
         else
-            log_warn "Node.js $(node -v) is older than v20."
+            log_warn "Node.js $(node -v) is older than v22."
         fi
     fi
 
     if [ "$NODE_READY" = false ]; then
-        log_info "Configuring Node.js 20 LTS..."
+        log_info "Configuring Node.js 22 LTS..."
 
         INSTALLED=false
 
         # Attempt 1: NodeSource for APT
         if [ "$PKG_MANAGER" = "apt" ]; then
             heal_dpkg
-            log_info "Adding NodeSource 20.x repository..."
-            curl -fsSL https://deb.nodesource.com/setup_20.x | bash - >/dev/null 2>&1 || true
-            if apt-get install -y -qq nodejs >/dev/null 2>&1; then
+            log_info "Adding NodeSource 22.x repository..."
+            curl -fsSL https://deb.nodesource.com/setup_22.x | bash - >/dev/null 2>&1 || true
+            if apt-get install -y -qq nodejs build-essential >/dev/null 2>&1; then
                 INSTALLED=true
             fi
         elif [ "$PKG_MANAGER" = "dnf" ] || [ "$PKG_MANAGER" = "yum" ]; then
-            curl -fsSL https://rpm.nodesource.com/setup_20.x | bash - >/dev/null 2>&1 || true
-            if $PKG_MANAGER install -y -q nodejs >/dev/null 2>&1; then
+            curl -fsSL https://rpm.nodesource.com/setup_22.x | bash - >/dev/null 2>&1 || true
+            if $PKG_MANAGER install -y -q nodejs gcc gcc-c++ make >/dev/null 2>&1; then
                 INSTALLED=true
             fi
         elif [ "$PKG_MANAGER" = "pacman" ]; then
