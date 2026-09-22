@@ -459,10 +459,10 @@ print_completion() {
     echo -e "${WHITE}${BOLD}Process Manager:${RESET}      ${WHITE}PM2 (Process Manager 2)${RESET}"
     echo -e "${WHITE}${BOLD}Process Name:${RESET}         ${WHITE}kinetichost${RESET}\n"
 
-    echo -e "${YELLOW}${BOLD}Default Staff Credentials:${RESET}"
-    echo -e " • Email:    ${WHITE}ayan@kinetic.host${RESET} (or any email containing 'admin')"
-    echo -e " • Password: ${WHITE}password123${RESET}"
-    echo -e " • Standard: ${WHITE}user@kinetic.host${RESET} / ${WHITE}password123${RESET}\n"
+    echo -e "${WHITE}${BOLD}Authentication & Backend Integration:${RESET}"
+    echo -e " • User accounts and admin privileges are authenticated via your backend API at ${CYAN}/api${RESET}."
+    echo -e " • Configure ${CYAN}VITE_API_URL${RESET} in .env if your API is hosted on a separate domain."
+    echo -e " • Register your first account or seed an admin user through your backend service.\n"
 
     echo -e "${WHITE}${BOLD}PM2 Process Management Commands:${RESET}"
     echo -e " • View Status:     ${CYAN}pm2 status${RESET}"
