@@ -10,4 +10,12 @@ export default defineConfig({
       "next/link": path.resolve(__dirname, "./src/components/ui/link.tsx"),
     },
   },
+  server: {
+    host: true,
+    allowedHosts: true,
+  },
+  preview: {
+    host: true,
+    allowedHosts: true,
+  },
 })
