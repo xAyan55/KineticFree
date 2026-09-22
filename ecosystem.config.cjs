@@ -1,10 +1,12 @@
+const path = require("path");
 const port = process.env.PORT || 3000;
 
 module.exports = {
   apps: [
     {
       name: "kinetichost",
-      script: "dist-server/index.js",
+      script: path.resolve(__dirname, "dist-server", "index.js"),
+      cwd: __dirname,
       env: {
         NODE_ENV: "production",
         PORT: port,
