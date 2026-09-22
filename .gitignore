@@ -10,7 +10,13 @@ lerna-debug.log*
 # Dependencies
 node_modules
 dist
+dist-server
 dist-ssr
+data
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
 *.local
 
 # Editor directories and files

@@ -4,8 +4,7 @@ module.exports = {
   apps: [
     {
       name: "kinetichost",
-      script: "node_modules/vite/bin/vite.js",
-      args: `preview --host 0.0.0.0 --port ${port}`,
+      script: "dist-server/index.js",
       env: {
         NODE_ENV: "production",
         PORT: port,

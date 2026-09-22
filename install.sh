@@ -380,8 +380,7 @@ module.exports = {
   apps: [
     {
       name: "kinetichost",
-      script: "node_modules/vite/bin/vite.js",
-      args: "preview --host 0.0.0.0 --port ${PANEL_PORT}",
+      script: "dist-server/index.js",
       cwd: "${INSTALL_DIR}",
       env: {
         NODE_ENV: "production",
@@ -459,10 +458,10 @@ print_completion() {
     echo -e "${WHITE}${BOLD}Process Manager:${RESET}      ${WHITE}PM2 (Process Manager 2)${RESET}"
     echo -e "${WHITE}${BOLD}Process Name:${RESET}         ${WHITE}kinetichost${RESET}\n"
 
-    echo -e "${WHITE}${BOLD}Authentication & Backend Integration:${RESET}"
-    echo -e " • User accounts and admin privileges are authenticated via your backend API at ${CYAN}/api${RESET}."
-    echo -e " • Configure ${CYAN}VITE_API_URL${RESET} in .env if your API is hosted on a separate domain."
-    echo -e " • Register your first account or seed an admin user through your backend service.\n"
+    echo -e "${YELLOW}${BOLD}Default Admin Credentials:${RESET}"
+    echo -e " • Email:    ${WHITE}ayan@kinetic.host${RESET}"
+    echo -e " • Password: ${WHITE}password123${RESET}"
+    echo -e " • Note:     ${DIM}You can change your password anytime under Account Settings.${RESET}\n"
 
     echo -e "${WHITE}${BOLD}PM2 Process Management Commands:${RESET}"
     echo -e " • View Status:     ${CYAN}pm2 status${RESET}"
