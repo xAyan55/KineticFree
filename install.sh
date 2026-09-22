@@ -79,7 +79,7 @@ print_banner() {
 EOF
     echo -e "${RESET}"
     echo -e "${WHITE}${BOLD} KineticHost — High Performance Minecraft Hosting Control Panel${RESET}"
-    echo -e "${DIM} Automated One-Click Installation & Systemd Deployment Script${RESET}"
+    echo -e "${DIM} Automated One-Click Installation & PM2 Deployment Script${RESET}"
     echo -e "${DIM} https://github.com/xAyan55/KineticFree${RESET}"
     echo -e "${CYAN}----------------------------------------------------------------------${RESET}\n"
 }
@@ -248,14 +248,15 @@ install_nodejs() {
             esac
 
             NODE_VERSION="v20.18.0"
-            NODE_TAR="node-${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz"
+            NODE_TAR="node-${NODE_VERSION}-linux-${NODE_ARCH}.tar.gz"
             NODE_URL="https://nodejs.org/dist/${NODE_VERSION}/${NODE_TAR}"
 
             log_info "Downloading prebuilt Node.js binary from ${NODE_URL}..."
             mkdir -p /tmp/nodejs-install
             curl -fsSL "$NODE_URL" -o "/tmp/nodejs-install/${NODE_TAR}"
-            tar -xf "/tmp/nodejs-install/${NODE_TAR}" -C /usr/local --strip-components=1
+            tar -xzf "/tmp/nodejs-install/${NODE_TAR}" -C /usr/local --strip-components=1
             rm -rf /tmp/nodejs-install
+            export PATH="/usr/local/bin:$PATH"
         fi
     fi
 
@@ -341,42 +342,73 @@ build_application() {
     log_success "Production bundle generated in ${INSTALL_DIR}/dist"
 }
 
-# --- Setup Systemd Background Service ---
-setup_systemd() {
-    log_step "Configuring Systemd Service (kinetichost.service)..."
+# --- Setup PM2 Process Manager ---
+setup_pm2() {
+    log_step "Configuring PM2 Process Manager..."
 
-    NODE_PATH=$(command -v node || echo "/usr/local/bin/node")
-    NPX_PATH=$(command -v npx || echo "/usr/local/bin/npx")
-    NODE_DIR=$(dirname "$NODE_PATH")
+    # Clean up any legacy systemd service if upgrading from older installer
+    if systemctl is-active --quiet kinetichost 2>/dev/null; then
+        log_info "Stopping legacy systemd service..."
+        systemctl stop kinetichost 2>/dev/null || true
+        systemctl disable kinetichost 2>/dev/null || true
+        rm -f /etc/systemd/system/kinetichost.service 2>/dev/null || true
+        systemctl daemon-reload 2>/dev/null || true
+    fi
 
-    cat << EOF > /etc/systemd/system/kinetichost.service
-[Unit]
-Description=KineticHost Minecraft Control Panel
-After=network.target
+    # Check / Install PM2 globally
+    if ! command -v pm2 >/dev/null 2>&1; then
+        log_info "Installing PM2 globally via npm..."
+        npm install -g pm2 --silent || npm install -g pm2 || true
+    fi
 
-[Service]
-Type=simple
-User=root
-WorkingDirectory=${INSTALL_DIR}
-Environment="PATH=${NODE_DIR}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-Environment=NODE_ENV=production
-ExecStart=${NPX_PATH} vite preview --host 0.0.0.0 --port ${PANEL_PORT}
-Restart=always
-RestartSec=5
-LimitNOFILE=65535
+    export PATH="/usr/local/bin:$PATH"
 
-[Install]
-WantedBy=multi-user.target
+    if command -v pm2 >/dev/null 2>&1; then
+        PM2_CMD="pm2"
+    elif [ -f "./node_modules/.bin/pm2" ]; then
+        PM2_CMD="./node_modules/.bin/pm2"
+    else
+        log_warn "PM2 global binary not in PATH, attempting with npx..."
+        PM2_CMD="npx pm2"
+    fi
+
+    cd "$INSTALL_DIR"
+
+    # Create / update ecosystem configuration file
+    cat << EOF > "$INSTALL_DIR/ecosystem.config.cjs"
+module.exports = {
+  apps: [
+    {
+      name: "kinetichost",
+      script: "node_modules/vite/bin/vite.js",
+      args: "preview --host 0.0.0.0 --port ${PANEL_PORT}",
+      cwd: "${INSTALL_DIR}",
+      env: {
+        NODE_ENV: "production",
+        PORT: "${PANEL_PORT}"
+      },
+      watch: false,
+      autorestart: true,
+      max_restarts: 10,
+      restart_delay: 2000
+    }
+  ]
+};
 EOF
 
-    if command -v systemctl >/dev/null 2>&1; then
-        systemctl daemon-reload
-        systemctl enable kinetichost.service >/dev/null 2>&1 || true
-        systemctl restart kinetichost.service || true
-        log_success "Systemd service 'kinetichost' enabled and started."
-    else
-        log_warn "Systemd not detected in this environment. You can run manually with: npm run preview -- --port ${PANEL_PORT}"
-    fi
+    # Stop any previous PM2 instance
+    $PM2_CMD delete kinetichost 2>/dev/null || true
+
+    # Start application under PM2
+    log_info "Launching KineticHost under PM2..."
+    $PM2_CMD start "$INSTALL_DIR/ecosystem.config.cjs"
+
+    # Save PM2 state & enable auto-boot
+    log_info "Configuring PM2 boot persistence..."
+    $PM2_CMD startup systemd -u root --hp /root 2>/dev/null || $PM2_CMD startup 2>/dev/null || true
+    $PM2_CMD save 2>/dev/null || true
+
+    log_success "PM2 process 'kinetichost' is active, monitored, and enabled on system boot."
 }
 
 # --- Configure Firewall ---
@@ -411,7 +443,7 @@ verify_deployment() {
     if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "304" ]; then
         log_success "KineticHost is healthy and serving HTTP ${HTTP_STATUS} on port ${PANEL_PORT}!"
     else
-        log_info "Service is booting up (HTTP status: ${HTTP_STATUS})."
+        log_info "Service is booting up under PM2 (HTTP status: ${HTTP_STATUS})."
     fi
 }
 
@@ -424,18 +456,20 @@ print_completion() {
     echo -e "${WHITE}${BOLD}Access URL:${RESET}           ${CYAN}http://${PUBLIC_HOST}:${PANEL_PORT}/${RESET}"
     echo -e "${WHITE}${BOLD}Local URL:${RESET}            ${CYAN}http://localhost:${PANEL_PORT}/${RESET}"
     echo -e "${WHITE}${BOLD}Installation Path:${RESET}    ${WHITE}${INSTALL_DIR}${RESET}"
-    echo -e "${WHITE}${BOLD}System Service:${RESET}       ${WHITE}kinetichost.service${RESET}\n"
+    echo -e "${WHITE}${BOLD}Process Manager:${RESET}      ${WHITE}PM2 (Process Manager 2)${RESET}"
+    echo -e "${WHITE}${BOLD}Process Name:${RESET}         ${WHITE}kinetichost${RESET}\n"
 
     echo -e "${YELLOW}${BOLD}Default Staff Credentials:${RESET}"
     echo -e " • Email:    ${WHITE}ayan@kinetic.host${RESET} (or any email containing 'admin')"
     echo -e " • Password: ${WHITE}password123${RESET}"
     echo -e " • Standard: ${WHITE}user@kinetic.host${RESET} / ${WHITE}password123${RESET}\n"
 
-    echo -e "${WHITE}${BOLD}Service Management Commands:${RESET}"
-    echo -e " • View Status:   ${CYAN}systemctl status kinetichost${RESET}"
-    echo -e " • Restart Panel: ${CYAN}systemctl restart kinetichost${RESET}"
-    echo -e " • Stop Panel:    ${CYAN}systemctl stop kinetichost${RESET}"
-    echo -e " • View Logs:     ${CYAN}journalctl -u kinetichost -f${RESET}\n"
+    echo -e "${WHITE}${BOLD}PM2 Process Management Commands:${RESET}"
+    echo -e " • View Status:     ${CYAN}pm2 status${RESET}"
+    echo -e " • Stream Logs:     ${CYAN}pm2 logs kinetichost${RESET}"
+    echo -e " • Restart Panel:   ${CYAN}pm2 restart kinetichost${RESET}"
+    echo -e " • Stop Panel:      ${CYAN}pm2 stop kinetichost${RESET}"
+    echo -e " • Performance:     ${CYAN}pm2 monit${RESET}\n"
 
     echo -e "${DIM}Need support or updates? Visit https://github.com/xAyan55/KineticFree${RESET}\n"
 }
@@ -450,7 +484,7 @@ main() {
     prompt_configuration
     setup_repository
     build_application
-    setup_systemd
+    setup_pm2
     setup_firewall
     verify_deployment
     print_completion

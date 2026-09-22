@@ -22,10 +22,31 @@ sudo bash install.sh
 
 The automated installer will:
 1. Detect your Linux distribution and architecture.
-2. Install system dependencies and Node.js 20+ LTS.
+2. Verify system dependencies and install Node.js 20+ LTS runtime.
 3. Fetch dependencies and compile the production bundle.
-4. Configure and enable `kinetichost.service` via systemd for 24/7 background operation.
+4. Daemonize and monitor the application using **PM2 (Process Manager 2)** with auto-restart on boot.
 5. Open firewall ports for the web panel, Minecraft (`25565`), and SFTP (`2022`).
+
+### 📊 PM2 Process Management Commands
+
+Control and monitor KineticHost via PM2:
+
+```bash
+# Check process status and resource usage
+pm2 status
+
+# Stream live real-time logs
+pm2 logs kinetichost
+
+# Restart the panel
+pm2 restart kinetichost
+
+# Stop the panel
+pm2 stop kinetichost
+
+# Real-time interactive CPU & Memory monitor
+pm2 monit
+```
 
 ---
 
