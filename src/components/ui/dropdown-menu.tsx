@@ -5,7 +5,29 @@ import { cn } from "@/lib/utils"
 
 const DropdownMenu = DropdownMenuPrimitive.Root
 
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
+interface DropdownMenuTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Trigger> {
+  render?: React.ReactNode
+}
+
+const DropdownMenuTrigger = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Trigger>,
+  DropdownMenuTriggerProps
+>(({ children, render, asChild, ...props }, ref) => {
+  if (render) {
+    return (
+      <DropdownMenuPrimitive.Trigger ref={ref} asChild {...props}>
+        {render}
+      </DropdownMenuPrimitive.Trigger>
+    )
+  }
+  return (
+    <DropdownMenuPrimitive.Trigger ref={ref} asChild={asChild} {...props}>
+      {children}
+    </DropdownMenuPrimitive.Trigger>
+  )
+})
+DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName
 
 const DropdownMenuGroup = DropdownMenuPrimitive.Group
 
@@ -71,16 +93,21 @@ const DropdownMenuContent = React.forwardRef<
 ))
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 
+export interface DropdownMenuItemProps
+  extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> {
+  inset?: boolean
+  variant?: "default" | "destructive"
+}
+
 const DropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
-    inset?: boolean
-  }
->(({ className, inset, ...props }, ref) => (
+  DropdownMenuItemProps
+>(({ className, inset, variant = "default", ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-xs outline-none transition-colors focus:bg-zinc-800 focus:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      variant === "destructive" && "text-red-400 focus:bg-red-500/20 focus:text-red-300",
       inset && "pl-8",
       className
     )}
@@ -89,10 +116,15 @@ const DropdownMenuItem = React.forwardRef<
 ))
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
 
+export interface DropdownMenuCheckboxItemProps
+  extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem> {
+  closeOnClick?: boolean
+}
+
 const DropdownMenuCheckboxItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>
->(({ className, children, checked, ...props }, ref) => (
+  DropdownMenuCheckboxItemProps
+>(({ className, children, checked, closeOnClick, onSelect, ...props }, ref) => (
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
@@ -100,6 +132,12 @@ const DropdownMenuCheckboxItem = React.forwardRef<
       className
     )}
     checked={checked}
+    onSelect={(e) => {
+      if (closeOnClick === false) {
+        e.preventDefault()
+      }
+      onSelect?.(e)
+    }}
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
